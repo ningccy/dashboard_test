@@ -6,16 +6,46 @@ import os
 from dotenv import load_dotenv
 import requests
 
-load_dotenv()
-
-API_BASE = "http://8.229.26.9:8000"
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_HOST = os.getenv("DB_HOST")
-DB_NAME = os.getenv("DB_NAME")
+#API_BASE = "http://8.229.26.9:8000"
+#DB_USER = os.getenv("DB_USER")
+#DB_PASSWORD = os.getenv("DB_PASSWORD")
+#DB_HOST = os.getenv("DB_HOST")
+#DB_NAME = os.getenv("DB_NAME")
 
 st.set_page_config(page_title="經濟健康度儀表板", layout="wide")
 Base = declarative_base()
+
+try:
+    db_config = st.secrets["mysql"]
+    DATABASE_URL = (
+        f"mysql+pymysql://{db_config[]}:{db_config['password']}@"
+        f"{db_config['host']}:{db_config['port']}/{db_config['database']}"
+        f"?ssl_verify_cert=true&ssl_verify_identity=true"
+    )
+
+    engine = create_engine(
+        DATABASE_URL,
+        pool_size=5,
+        max_overflow=10,
+        pool_timeout=30,
+        pool_recycle=1800
+    )
+    
+    SessionLocal = sessionmaker(
+        autocommit=False,
+        autoflush=False,
+        bind=engine
+    )
+
+    # 測試連線
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT NOW();"))
+        # 使用 st.write 讓你在網頁上也能看到測試結果
+        st.sidebar.success(f"✅ 資料庫連線成功！")
+        
+except Exception as e:
+    st.error(f"❌ 資料庫連線失敗：{e}")
+
 API_BASE = f"http://127.0.0.1:8000"  
 DATABASE_URL = "mysql+pymysql://root:yarrow1016@127.0.0.1:3306/macro_monitor_1"
 engine = create_engine(

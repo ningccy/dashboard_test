@@ -1,0 +1,14 @@
+streamlit
+fastapi
+uvicorn
+requests
+pandas
+yfinance
+plotly
+sqlalchemy
+pymysql
+pymongo
+feedparser
+textblob
+newspaper3k
+dotenv

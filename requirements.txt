@@ -12,3 +12,4 @@ feedparser
 textblob
 newspaper3k
 dotenv
+cryptography

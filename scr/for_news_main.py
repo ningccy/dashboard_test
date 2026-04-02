@@ -6,8 +6,27 @@ import time
 from sqlalchemy import create_engine, Column, Integer, Float, String, DateTime, Text
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-DATABASE_URL = "mysql+pymysql://root:yarrow1016@localhost/macro_monitor_1"
-engine = create_engine(DATABASE_URL)
+DB_USER = "4RyYfQMvnH9DmYu.root"
+DB_PASSWORD = "XD2WuF9AcDymVeCt"
+DB_HOST = "gateway01.ap-northeast-1.prod.aws.tidbcloud.com"
+DB_PORT = "4000"
+DB_NAME = "macro_monitor_1"
+
+DATABASE_URL = (
+    f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@"
+    f"{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    f"?ssl_verify_cert=true&ssl_verify_identity=true"
+)
+
+# 建立 Engine，加入連線池優化與 SSL 參數
+engine = create_engine(
+    DATABASE_URL,
+    pool_size=5,
+    max_overflow=10,
+    pool_recycle=3600,
+    connect_args={"ssl": {"fake_flag_to_enable_tls": True}}
+)
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
@@ -42,6 +61,8 @@ def calculate_importance(content, sentiment_score):
     return round(total_score, 3)
 
 def main():
+    Base.metadata.create_all(bind=engine)
+    
     db = SessionLocal()
     print("--- 開始抓取新聞 ---")
     try:

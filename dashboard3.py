@@ -6,12 +6,6 @@ import os
 from dotenv import load_dotenv
 import requests
 
-#API_BASE = "http://8.229.26.9:8000"
-#DB_USER = os.getenv("DB_USER")
-#DB_PASSWORD = os.getenv("DB_PASSWORD")
-#DB_HOST = os.getenv("DB_HOST")
-#DB_NAME = os.getenv("DB_NAME")
-
 st.set_page_config(page_title="經濟健康度儀表板", layout="wide")
 Base = declarative_base()
 
@@ -40,7 +34,6 @@ try:
     # 測試連線
     with engine.connect() as conn:
         result = conn.execute(text("SELECT NOW();"))
-        # 使用 st.write 讓你在網頁上也能看到測試結果
         st.sidebar.success(f"✅ 資料庫連線成功！")
         
 except Exception as e:

@@ -33,32 +33,11 @@ try:
 
     # 測試連線
     with engine.connect() as conn:
-        result = conn.execute(text("SELECT NOW();"))
+        result = conn.execute(text("SELECT 1;"))
         st.sidebar.success(f"✅ 資料庫連線成功！")
         
 except Exception as e:
     st.error(f"❌ 資料庫連線失敗：{e}")
-
-
-engine = create_engine(
-    DATABASE_URL,
-    pool_size=5,
-    max_overflow=10,
-    pool_timeout=30,
-    pool_recycle= 1800
-)
-SessionLocal = sessionmaker(
-    autocommit=False,
-    autoflush=False,
-    bind=engine
-)
-try:
-    with engine.connect() as conn:
-        result = conn.execute(text("SELECT NOW();"))
-        print("✅ 連線成功！資料庫時間：", result.fetchone())
-except Exception as e:
-    print("❌ 連線失敗：", e)
-
 
 @st.cache_data(ttl=300)
 def fetch_stock_price(symbol):

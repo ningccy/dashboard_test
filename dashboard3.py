@@ -18,8 +18,8 @@ Base = declarative_base()
 try:
     db_config = st.secrets["mysql"]
     DATABASE_URL = (
-        f"mysql+pymysql://{db_config[4RyYfQMvnH9DmYu.root]}:{db_config[XD2WuF9AcDymVeCt]}@"
-        f"{db_config[gateway01.ap-northeast-1.prod.aws.tidbcloud.com]}:{db_config[4000]}/{db_config[macro_monitor_1]}"
+        f"mysql+pymysql://{db_config['user']}:{db_config['password']}@"
+        f"{db_config['host']}:{db_config['port']}/{db_config['database']}"
         f"?ssl_verify_cert=true&ssl_verify_identity=true"
     )
 

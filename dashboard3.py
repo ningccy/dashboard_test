@@ -46,8 +46,7 @@ try:
 except Exception as e:
     st.error(f"❌ 資料庫連線失敗：{e}")
 
-API_BASE = f"http://127.0.0.1:8000"  
-DATABASE_URL = "mysql+pymysql://root:yarrow1016@127.0.0.1:3306/macro_monitor_1"
+
 engine = create_engine(
     DATABASE_URL,
     pool_size=5,
@@ -68,8 +67,6 @@ except Exception as e:
     print("❌ 連線失敗：", e)
 
 
-
-#(保留) 從 API 獲取即時個股價格
 @st.cache_data(ttl=300)
 def fetch_stock_price(symbol):
     try:

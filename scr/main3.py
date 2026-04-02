@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query, HTTPException  # 增加 Query 用於參數處理，HTTP能準確回報錯誤給streamlit
+from fastapi import FastAPI, Query, HTTPException  
 from sqlalchemy import create_engine, Column, Integer, Float, String, Date
 from sqlalchemy.orm import sessionmaker, declarative_base
 from typing import Optional
@@ -9,14 +9,27 @@ import yfinance as yf
 import pandas as pd
 
 app = FastAPI()
+-----------------------------------------------------------
+DB_USER = "4RyYfQMvnH9DmYu.root"
+DB_PASSWORD = "XD2WuF9AcDymVeCt"
+DB_HOST = "gateway01.ap-northeast-1.prod.aws.tidbcloud.com"
+DB_PORT = "4000"
+DB_NAME = "macro_monitor_1"
 
-DATABASE_URL = "mysql+pymysql://root:yarrow1016@localhost/macro_monitor_1"
+DATABASE_URL = (
+    f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@"
+    f"{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    f"?ssl_verify_cert=true&ssl_verify_identity=true"
+)
+
 engine = create_engine(
     DATABASE_URL, 
     pool_size=10, 
     max_overflow=20,
-    pool_recycle=3600
+    pool_recycle=3600,
+    connect_args={"ssl": {"fake_flag_to_enable_tls": True}} # 有些 pymysql 版本需要這行來啟動 TLS
 )
+----------------------------------------------------------
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
@@ -83,7 +96,6 @@ def get_available_dates():
     finally:
         db.close()
 
-# 獲取評分與燈號
 @app.get("/signal")
 def get_signal(target_date: Optional[str] = None):
     db = SessionLocal()

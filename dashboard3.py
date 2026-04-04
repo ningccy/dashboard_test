@@ -63,6 +63,7 @@ class NewsArticle(Base):
 class EconomicScore(Base):
     __tablename__ = "economic_score"
     id = Column(Integer, primary_key=True, index=True)
+    symbol = Column(String(20))
     score_date = Column(Date)
     cpi_score = Column(Float)
     ppi_score = Column(Float)
@@ -109,42 +110,34 @@ for i, symbol in enumerate(target_stocks):
 
 st.divider()
 ##________________________________________________________________
-def get_db_engine():
-    db_info = {
-        "user": "4RyYfQMvnH9DmYu.root",
-        "pw": "XD2WuF9AcDymVeCt",
-        "host": "gateway01.ap-northeast-1.prod.aws.tidbcloud.com",
-        "port": 4000,
-        "db": "macro_monitor_1"
-    }
-    url = "mysql+pymysql://4RyYfQMvnH9DmYu.root:XD2WuF9AcDymVeCt@gateway01.ap-northeast-1.prod.aws.tidbcloud.com:4000/macro_monitor_1?ssl_ca=/etc/ssl/cert.pem"
-    return create_engine(url)
-
-engine = get_db_engine()
-
-st.title("⚖️ 大盤指數圖 🔍")
-query = "SELECT symbol, score_date, total_score FROM economic_score ORDER BY score_date ASC"
-
-try:
-    df_scores = pd.read_sql(query, engine)
-    df_scores['score_date'] = pd.to_datetime(df_scores['score_date'])
-
-    st.subheader("指數趨勢 (IWM & DJI)")
+def show_main_charts():
+    st.title("⚖️ 大盤指數圖 🔍")
+    query = "SELECT symbol, score_date, total_score FROM economic_score ORDER BY score_date ASC"
     
-    # 使用 pivot 讓資料適合畫圖：Index 為日期，Columns 為 symbol
-    plot_data = df_scores.pivot(index='score_date', columns='symbol', values='total_score')
-    
-    # 在 Streamlit 顯示折線圖
-    st.line_chart(plot_data)
+    try:
+        # 使用全域已經連線成功的 engine
+        df_scores = pd.read_sql(query, engine)
+        
+        if df_scores.empty:
+            st.warning("資料庫中沒有可顯示的指數資料。")
+            return
 
-    # 也可以用分欄顯示最新的分數
-    cols = st.columns(len(plot_data.columns))
-    for i, symbol in enumerate(plot_data.columns):
-        latest_score = plot_data[symbol].iloc[-1]
-        cols[i].metric(label=f"{symbol} 最新評分", value=f"{latest_score:.1f}")
+        df_scores['score_date'] = pd.to_datetime(df_scores['score_date'])
+        
+        # 修正 Pivot 邏輯
+        plot_data = df_scores.pivot(index='score_date', columns='symbol', values='total_score')
+        
+        st.subheader("指數趨勢 (IWM & DJI)")
+        st.line_chart(plot_data)
 
-except Exception as e:
-    st.error(f"無法讀取資料庫：{e}")
+        # 顯示最新指標
+        cols = st.columns(len(plot_data.columns))
+        for i, symbol in enumerate(plot_data.columns):
+            latest_score = plot_data[symbol].dropna().iloc[-1]
+            cols[i].metric(label=f"{symbol} 最新評分", value=f"{latest_score:.1f}")
+            
+    except Exception as e:
+        st.error(f"繪圖發生錯誤：{e}")
 ##________________________________________________________
 def show_economic_dashboard():
     st.title("📊 經濟健康燈號 🚥")
@@ -213,6 +206,7 @@ def show_news_dashboard():
     
 pg = st.navigation([
     st.Page(show_economic_dashboard, title="經濟指標", icon="📈"),
+    st.Page(show_main_charts, title="大盤指數圖", icon="⚖️"),
     st.Page(show_news_dashboard, title="美股新聞", icon="📰"),
 ])
 st.sidebar.title("金融監控中心")

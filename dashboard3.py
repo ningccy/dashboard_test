@@ -38,7 +38,6 @@ try:
     
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     Base = declarative_base()
-    Base.metadata.create_all(bind=engine)
 
     with engine.connect() as conn:
         conn.execute(text("SELECT 1;"))
@@ -70,8 +69,9 @@ class EconomicScore(Base):
     total_score = Column(Float)
     signal_light = Column(String(10))
 
-# API 邏輯
+Base.metadata.create_all(bind=engine)
 
+# API 邏輯
 @st.cache_data(ttl=600)
 def fetch_stock_price_internal(symbol):
 # 直接執行 yfinance 

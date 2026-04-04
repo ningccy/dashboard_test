@@ -117,7 +117,7 @@ def get_db_engine():
         "port": 4000,
         "db": "macro_monitor_1"
     }
-    url = f"mysql+pymysql://{db_info['user']}:{db_info['pw']}@{db_info['host']}:{db_info['port']}/{db_info['db']}?ssl_ca=/etc/ssl/cert.pem"
+   db_url = "mysql+pymysql://4RyYfQMvnH9DmYu.root:XD2WuF9AcDymVeCt@gateway01.ap-northeast-1.prod.aws.tidbcloud.com:4000/macro_monitor_1?ssl_ca=/etc/ssl/cert.pem"
     
     return create_engine(url)
 

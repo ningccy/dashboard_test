@@ -107,7 +107,45 @@ for i, symbol in enumerate(target_stocks):
             st.info(f"等待 {symbol}...")
 
 st.divider()
+##________________________________________________________________
+def get_db_engine():
+    USERNAME = st.secrets["tidb"]["4RyYfQMvnH9DmYu.root"] # 建議將敏感資訊放在 .streamlit/secrets.toml
+    PASSWORD = st.secrets["tidb"]["XD2WuF9AcDymVeCt"]
+    HOST = st.secrets["tidb"]["gateway01.ap-northeast-1.prod.aws.tidbcloud.com"]
+    PORT = st.secrets["tidb"]["4000"]
+    DATABASE = st.secrets["tidb"]["macro_monitor_1"]
+    
+    url = f"mysql+pymysql://{4RyYfQMvnH9DmYu.root}:{XD2WuF9AcDymVeCt}@{gateway01.ap-northeast-1.prod.aws.tidbcloud.com}:{4000}/{macro_monitor_1}?ssl_ca=/etc/ssl/cert.pem"
+    return create_engine(url)
 
+st.title("⚖️ 大盤指數圖 🔍")
+
+# 讀取資料
+engine = get_db_engine()
+query = "SELECT symbol, score_date, total_score FROM economic_score ORDER BY score_date ASC"
+
+try:
+    df_scores = pd.read_sql(query, engine)
+    df_scores['score_date'] = pd.to_datetime(df_scores['score_date'])
+
+    # --- 呈現折線圖 ---
+    st.subheader("指數健康度評分趨勢 (IWM & DJI)")
+    
+    # 使用 pivot 讓資料適合畫圖：Index 為日期，Columns 為 symbol
+    plot_data = df_scores.pivot(index='score_date', columns='symbol', values='total_score')
+    
+    # 在 Streamlit 顯示折線圖
+    st.line_chart(plot_data)
+
+    # 也可以用分欄顯示最新的分數
+    cols = st.columns(len(plot_data.columns))
+    for i, symbol in enumerate(plot_data.columns):
+        latest_score = plot_data[symbol].iloc[-1]
+        cols[i].metric(label=f"{symbol} 最新評分", value=f"{latest_score:.1f}")
+
+except Exception as e:
+    st.error(f"無法讀取資料庫：{e}")
+##________________________________________________________
 def show_economic_dashboard():
     st.title("📊 經濟健康燈號 🚥")
     db = SessionLocal()

@@ -8,13 +8,12 @@ import pandas as pd
 st.set_page_config(page_title="經濟健康度儀表板", layout="wide")
 Base = declarative_base()
 
-# --- 2. 資料庫連線設定 (整合 TiDB Cloud 資訊) ---
 try:
-    # 優先從 Streamlit Secrets 讀取，若無則使用寫死的資訊（建議在 Secrets 填寫）
+
     if "mysql" in st.secrets:
         db_config = st.secrets["mysql"]
     else:
-        # 這裡保留你 main3.py 中的連線資訊作為後備
+        # 連線資訊作為後備
         db_config = {
             "user": "4RyYfQMvnH9DmYu.root",
             "password": "XD2WuF9AcDymVeCt",
@@ -49,7 +48,7 @@ except Exception as e:
     st.error(f"❌ 資料庫連線失敗：{e}")
     st.stop()
 
-# --- 3. 資料模型定義 (結合 main3.py 與原本的定義) ---
+
 class NewsArticle(Base):
     __tablename__ = "news_articles"
     id = Column(Integer, primary_key=True, index=True)
@@ -71,11 +70,11 @@ class EconomicScore(Base):
     total_score = Column(Float)
     signal_light = Column(String(10))
 
-# --- 4. 功能函數整合 (原本 main3.py 的 API 邏輯) ---
+# API 邏輯
 
 @st.cache_data(ttl=600)
 def fetch_stock_price_internal(symbol):
-# 取代原本 requests.get 的 API 呼叫，直接執行 yfinance 邏輯
+# 直接執行 yfinance 
     try:
         stock = yf.Ticker(symbol)
         hist = stock.history(period="1mo")
@@ -91,7 +90,6 @@ def fetch_stock_price_internal(symbol):
     except:
         return None
 
-# --- 5. UI 呈現：即時股價監控 ---
 st.subheader("🔥 熱門標的即時監控")
 target_stocks = ["NVDA", "TSLA", "COST", "BA"] 
 stock_cols = st.columns(len(target_stocks))
@@ -110,12 +108,10 @@ for i, symbol in enumerate(target_stocks):
 
 st.divider()
 
-# --- 6. 分頁內容：經濟指標 ---
 def show_economic_dashboard():
     st.title("📊 經濟健康燈號 🚥")
     db = SessionLocal()
     try: 
-        # 獲取日期清單 (對應原本 API 的 /available_dates)
         dates = db.query(EconomicScore.score_date).distinct().order_by(EconomicScore.score_date.desc()).all()
         available_dates = [str(d.score_date) for d in dates]
 
@@ -126,7 +122,6 @@ def show_economic_dashboard():
         selected_date = st.sidebar.selectbox("選擇查詢月份", options=available_dates)
 
         if selected_date:
-            # 獲取評分資料 (對應原本 API 的 /signal)
             data = db.query(EconomicScore).filter(EconomicScore.score_date == selected_date).first()
 
             if data:
@@ -141,7 +136,6 @@ def show_economic_dashboard():
                     else:
                         st.success("🟢 穩健綠燈")
                 
-                # 額外顯示詳細細項 (原本 main3.py 有但原本 dashboard 沒顯示的)
                 with st.expander("查看詳細組成分數"):
                     st.write(f"CPI 分數: {data.cpi_score}")
                     st.write(f"PPI 分數: {data.ppi_score}")
@@ -149,7 +143,6 @@ def show_economic_dashboard():
     finally:
         db.close()
 
-# --- 7. 分頁內容：美股新聞 ---
 def show_news_dashboard():
     st.title("📰 美股精選新聞 💰")
 
@@ -157,8 +150,6 @@ def show_news_dashboard():
     limit = st.sidebar.number_input("顯示數量", 5, 50, 10)
 
     db = SessionLocal()
-    try:
-        # 對應原本 API 的 /news 邏輯
         time_threshold = datetime.now() - timedelta(days=days)
         top_news = db.query(NewsArticle) \
             .filter(NewsArticle.created_at >= time_threshold) \
@@ -181,7 +172,6 @@ def show_news_dashboard():
     finally:
         db.close()
 
-# --- 8. 導航與側邊欄控制 ---
 pg = st.navigation([
     st.Page(show_economic_dashboard, title="經濟指標", icon="📈"),
     st.Page(show_news_dashboard, title="美股新聞", icon="📰"),

@@ -118,8 +118,8 @@ def get_db_engine():
         "db": "macro_monitor_1"
     }
     url = "mysql+pymysql://4RyYfQMvnH9DmYu.root:XD2WuF9AcDymVeCt@gateway01.ap-northeast-1.prod.aws.tidbcloud.com:4000/macro_monitor_1?ssl_ca=/etc/ssl/cert.pem"
-    
     return create_engine(url)
+
 engine = get_db_engine()
 
 st.title("⚖️ 大盤指數圖 🔍")

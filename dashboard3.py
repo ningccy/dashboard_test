@@ -15,11 +15,11 @@ try:
     else:
         # 連線資訊作為後備
         db_config = {
-            "user" = "4RyYfQMvnH9DmYu.root",
-            "password" = "XD2WuF9AcDymVeCt",
-            "host" = "gateway01.ap-northeast-1.prod.aws.tidbcloud.com",
-            "port" = "4000",
-            "database" = "macro_monitor_1"
+            "user": "4RyYfQMvnH9DmYu.root",
+            "password": "XD2WuF9AcDymVeCt",
+            "host": "gateway01.ap-northeast-1.prod.aws.tidbcloud.com",
+            "port": "4000",
+            "database": "macro_monitor_1"
         }
 
     DATABASE_URL = (

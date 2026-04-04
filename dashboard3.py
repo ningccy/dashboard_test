@@ -169,8 +169,8 @@ def show_news_dashboard():
                     with st.expander("內容摘要"):
                         st.write(news.content)
             st.divider()
-    finally:
-        db.close()
+finally:
+    db.close()
 
 pg = st.navigation([
     st.Page(show_economic_dashboard, title="經濟指標", icon="📈"),

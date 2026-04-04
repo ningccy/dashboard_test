@@ -112,43 +112,25 @@ st.divider()
 ##________________________________________________________________
 def show_main_charts():
     st.title("⚖️ 大盤指數圖 🔍")
+
     query = "SELECT score_date, total_score FROM economic_score ORDER BY score_date ASC"
     
     try:
-        # 使用全域已經連線成功的 engine
         df_scores = pd.read_sql(query, engine)
         
         if df_scores.empty:
             st.warning("資料庫中沒有可顯示的指數資料。")
         else:
-        df_scores['score_date'] = pd.to_datetime(df_scores['score_date'])
-        
-        # 將日期設為索引，這樣 line_chart 會自動以日期為 X 軸
-        df_scores = df_scores.set_index('score_date')
+            df_scores['score_date'] = pd.to_datetime(df_scores['score_date'])
+            plot_df = df_scores.set_index('score_date')
 
-        st.subheader("經濟綜合得分趨勢")
-        
-        # 繪製折線圖
-        st.line_chart(df_scores['total_score'])
+            st.subheader("經濟綜合得分趨勢")
+            st.line_chart(plot_df['total_score'])
 
-        # 顯示最新評分
-        latest_score = df_scores['total_score'].iloc[-1]
-        st.metric(label="最新綜合評分", value=f"{latest_score:.1f}")
-
-        df_scores['score_date'] = pd.to_datetime(df_scores['score_date'])
-        
-        # 修正 Pivot 邏輯
-        plot_data = df_scores.pivot(index='score_date', columns='symbol', values='total_score')
-        
-        st.subheader("指數趨勢 (IWM & DJI)")
-        st.line_chart(plot_data)
-
-        # 顯示最新指標
-        cols = st.columns(len(plot_data.columns))
-        for i, symbol in enumerate(plot_data.columns):
-            latest_score = plot_data[symbol].dropna().iloc[-1]
-            cols[i].metric(label=f"{symbol} 最新評分", value=f"{latest_score:.1f}")
-            
+            if len(plot_df) > 0:
+                latest_score = plot_df['total_score'].iloc[-1]
+                st.metric(label="最新經濟綜合評分", value=f"{latest_score:.1f}")
+                
     except Exception as e:
         st.error(f"繪圖發生錯誤：{e}")
 ##________________________________________________________

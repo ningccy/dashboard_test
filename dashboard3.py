@@ -110,20 +110,19 @@ for i, symbol in enumerate(target_stocks):
 st.divider()
 ##________________________________________________________________
 def get_db_engine():
-    db_conf = st.secrets["tidb"]
+    db_info = {
+        "user": "4RyYfQMvnH9DmYu.root",
+        "pw": "XD2WuF9AcDymVeCt",
+        "host": "gateway01.ap-northeast-1.prod.aws.tidbcloud.com",
+        "port": 4000,
+        "db": "macro_monitor_1"
+    }
+    url = f"mysql+pymysql://{db_info['user']}:{db_info['pw']}@{db_info['host']}:{db_info['port']}/{db_info['db']}?ssl_ca=/etc/ssl/cert.pem"
     
-    user = db_conf["user"]
-    password = db_conf["password"]
-    host = db_conf["host"]
-    port = db_conf["port"]
-    database = db_conf["database"]
-    
-    url = f"mysql+pymysql://{4RyYfQMvnH9DmYu.root}:{XD2WuF9AcDymVeCt}@{gateway01.ap-northeast-1.prod.aws.tidbcloud.com}:{4000}/{macro_monitor_1}?ssl_ca=/etc/ssl/cert.pem"
     return create_engine(url)
 
 st.title("⚖️ 大盤指數圖 🔍")
 
-# 讀取資料
 engine = get_db_engine()
 query = "SELECT symbol, score_date, total_score FROM economic_score ORDER BY score_date ASC"
 
@@ -131,8 +130,7 @@ try:
     df_scores = pd.read_sql(query, engine)
     df_scores['score_date'] = pd.to_datetime(df_scores['score_date'])
 
-    # --- 呈現折線圖 ---
-    st.subheader("指數健康度評分趨勢 (IWM & DJI)")
+    st.subheader("指數趨勢 (IWM & DJI)")
     
     # 使用 pivot 讓資料適合畫圖：Index 為日期，Columns 為 symbol
     plot_data = df_scores.pivot(index='score_date', columns='symbol', values='total_score')

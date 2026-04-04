@@ -3,8 +3,13 @@ import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine, text
 
-DATABASE_URL = "mysql+pymysql://root:yarrow1016@127.0.0.1:3306/macro_monitor_1"
-engine = create_engine(DATABASE_URL)
+USERNAME = "4RyYfQMvnH9DmYu.root",
+PASSWORD = "XD2WuF9AcDymVeCt",
+HOST = "gateway01.ap-northeast-1.prod.aws.tidbcloud.com",
+PORT = "4000",
+DATABASE = "macro_monitor_1"
+
+DATABASE_URL = f"mysql+pymysql://{4RyYfQMvnH9DmYu.root}:{XD2WuF9AcDymVeCt}@{gateway01.ap-northeast-1.prod.aws.tidbcloud.com}:{4000}/{macro_monitor_1}?ssl_ca=/etc/ssl/cert.pem"
 
 def fetch_and_sync_stock(symbol):
     print(f"--- 正在同步：{symbol} ---")

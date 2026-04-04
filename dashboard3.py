@@ -120,7 +120,20 @@ def show_main_charts():
         
         if df_scores.empty:
             st.warning("資料庫中沒有可顯示的指數資料。")
-            return
+        else:
+        df_scores['score_date'] = pd.to_datetime(df_scores['score_date'])
+        
+        # 將日期設為索引，這樣 line_chart 會自動以日期為 X 軸
+        df_scores = df_scores.set_index('score_date')
+
+        st.subheader("經濟綜合得分趨勢")
+        
+        # 繪製折線圖
+        st.line_chart(df_scores['total_score'])
+
+        # 顯示最新評分
+        latest_score = df_scores['total_score'].iloc[-1]
+        st.metric(label="最新綜合評分", value=f"{latest_score:.1f}")
 
         df_scores['score_date'] = pd.to_datetime(df_scores['score_date'])
         

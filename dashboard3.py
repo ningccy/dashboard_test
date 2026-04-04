@@ -112,7 +112,7 @@ st.divider()
 ##________________________________________________________________
 def show_main_charts():
     st.title("⚖️ 大盤指數圖 🔍")
-    query = "SELECT symbol, score_date, total_score FROM economic_score ORDER BY score_date ASC"
+    query = "SELECT score_date, total_score FROM economic_score ORDER BY score_date ASC"
     
     try:
         # 使用全域已經連線成功的 engine

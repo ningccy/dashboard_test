@@ -156,19 +156,19 @@ def show_news_dashboard():
         .order_by(desc(NewsArticle.importance_score)) \
         .limit(limit).all()
 
-        if not top_news:
-            st.warning("所選範圍內尚無新聞資料。")
-        else:
-            for news in top_news:
-                with st.container():
-                    col_s, col_c = st.columns([1, 6])
-                    col_s.metric("重要性", f"{news.importance_score:.2f}")
-                    with col_c:
-                        st.subheader(f"[{news.title}]({news.link})")
-                        st.caption(f"來源: {news.source} | 情緒: {news.sentiment_score:.2f}")
-                        with st.expander("內容摘要"):
-                            st.write(news.content)
-                st.divider()
+    if not top_news:
+        st.warning("所選範圍內尚無新聞資料。")
+    else:
+        for news in top_news:
+            with st.container():
+                col_s, col_c = st.columns([1, 6])
+                col_s.metric("重要性", f"{news.importance_score:.2f}")
+                with col_c:
+                    st.subheader(f"[{news.title}]({news.link})")
+                    st.caption(f"來源: {news.source} | 情緒: {news.sentiment_score:.2f}")
+                    with st.expander("內容摘要"):
+                        st.write(news.content)
+            st.divider()
     finally:
         db.close()
 

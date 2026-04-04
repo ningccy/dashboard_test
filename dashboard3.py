@@ -110,11 +110,13 @@ for i, symbol in enumerate(target_stocks):
 st.divider()
 ##________________________________________________________________
 def get_db_engine():
-    USERNAME = st.secrets["tidb"]["4RyYfQMvnH9DmYu.root"] # 建議將敏感資訊放在 .streamlit/secrets.toml
-    PASSWORD = st.secrets["tidb"]["XD2WuF9AcDymVeCt"]
-    HOST = st.secrets["tidb"]["gateway01.ap-northeast-1.prod.aws.tidbcloud.com"]
-    PORT = st.secrets["tidb"]["4000"]
-    DATABASE = st.secrets["tidb"]["macro_monitor_1"]
+    db_conf = st.secrets["tidb"]
+    
+    user = db_conf["user"]
+    password = db_conf["password"]
+    host = db_conf["host"]
+    port = db_conf["port"]
+    database = db_conf["database"]
     
     url = f"mysql+pymysql://{4RyYfQMvnH9DmYu.root}:{XD2WuF9AcDymVeCt}@{gateway01.ap-northeast-1.prod.aws.tidbcloud.com}:{4000}/{macro_monitor_1}?ssl_ca=/etc/ssl/cert.pem"
     return create_engine(url)

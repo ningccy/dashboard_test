@@ -117,13 +117,12 @@ def get_db_engine():
         "port": 4000,
         "db": "macro_monitor_1"
     }
-   url = "mysql+pymysql://4RyYfQMvnH9DmYu.root:XD2WuF9AcDymVeCt@gateway01.ap-northeast-1.prod.aws.tidbcloud.com:4000/macro_monitor_1?ssl_ca=/etc/ssl/cert.pem"
+    url = "mysql+pymysql://4RyYfQMvnH9DmYu.root:XD2WuF9AcDymVeCt@gateway01.ap-northeast-1.prod.aws.tidbcloud.com:4000/macro_monitor_1?ssl_ca=/etc/ssl/cert.pem"
     
     return create_engine(url)
+engine = get_db_engine()
 
 st.title("⚖️ 大盤指數圖 🔍")
-
-engine = get_db_engine()
 query = "SELECT symbol, score_date, total_score FROM economic_score ORDER BY score_date ASC"
 
 try:

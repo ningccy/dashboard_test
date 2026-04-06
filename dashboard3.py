@@ -234,10 +234,10 @@ def show_economic_dashboard():
                 st.subheader("指標組成細項...")
                 c1, c2, c3 = st.columns(3)
 
-                cpi_val = safe_float(getattr(data, 'cpi_score', 0))
-                ppi_val = safe_float(getattr(data, 'ppi_score', 0))
-                fx_val = safe_float(getattr(data, 'fx_score', 0))
-
+                cpi_val = float(getattr(data, 'cpi_score', 0) or 0)
+                ppi_val = float(getattr(data, 'ppi_score', 0) or 0)
+                fx_val = float(getattr(data, 'fx_score', 0) or 0)
+                
                 c1.metric("CPI 分數", f"{cpi_val:.1f}")
                 c2.metric("PPI 分數", f"{ppi_val:.1f}")
                 c3.metric("匯率分數", f"{fx_val:.1f}")

@@ -68,7 +68,7 @@ def fetch_and_sync_stock(symbol):
         
         import_data['symbol'] = symbol
         import_data['score_date'] = import_data.index.strftime('%Y-%m-%d')
-        
+###        
         import_data['total_score'] = np.where(close_price > ma200, 80.0, 60.0)
         import_data.loc[ma200.isna(), 'total_score'] = 70.0 
         

@@ -120,6 +120,9 @@ def fetch_and_sync_stock(symbol):
                     close = VALUES(close),
                     adj_close = VALUES(adj_close),
                     volume = VALUES(volume),
+                    cpi_score = VALUES(cpi_score),
+                    ppi_score = VALUES(ppi_score),
+                    fx_score = VALUES(fx_score),
                     total_score = VALUES(total_score), 
                     signal_light = VALUES(signal_light)
             """)

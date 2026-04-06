@@ -128,24 +128,44 @@ st.divider()
 def show_main_charts():
     st.title("⚖️ 大盤指數圖 🔍")
 
-    query = "SELECT score_date, total_score FROM economic_score ORDER BY score_date ASC"
+    query = """
+    SELECT 
+        score_date,
+        MAX(CASE WHEN symbol = '^DJI' THEN adj_close END) AS dow_jones,
+        MAX(CASE WHEN symbol = 'IWM' THEN adj_close END) AS russell_2000,
+        AVG(total_score) AS avg_score
+    FROM economic_score 
+    GROUP BY score_date
+    ORDER BY score_date ASC
+    """
     
     try:
-        df_scores = pd.read_sql(query, engine)
+        df = pd.read_sql(query, engine)
         
-        if df_scores.empty:
-            st.warning("資料庫中沒有可顯示的指數資料。")
-        else:
-            df_scores['score_date'] = pd.to_datetime(df_scores['score_date'])
-            plot_df = df_scores.set_index('score_date')
+        if df.empty:
+            st.warning("資料庫中目前沒有數據，請執行 update_db.py 進行同步。")
+            return
 
-            st.subheader("經濟綜合得分趨勢")
-            st.line_chart(plot_df['total_score'])
+        df['score_date'] = pd.to_datetime(df['score_date'])
+        df = df.set_index('score_date')
 
-            if len(plot_df) > 0:
-                latest_score = plot_df['total_score'].iloc[-1]
-                st.metric(label="最新經濟綜合評分", value=f"{latest_score:.1f}")
-                
+        st.subheader("📊 大盤指數走勢")
+        tab1, tab2 = st.tabs(["絕對數值", "漲跌幅對比 (%)"])
+        
+        with tab1:
+            st.line_chart(df[['dow_jones', 'russell_2000']])
+            
+        with tab2:
+            norm_df = df[['dow_jones', 'russell_2000']].copy()
+            norm_df = (norm_df / norm_df.iloc[0] - 1) * 100
+            st.line_chart(norm_df)
+
+        st.divider()
+        latest = df.iloc[-1]
+        c1, c2 = st.columns(2)
+        c1.metric("道瓊指數", f"{latest['dow_jones']:,.2f}")
+        c2.metric("羅素 2000 (IWM)", f"{latest['russell_2000']:,.2f}")
+
     except Exception as e:
         st.error(f"繪圖發生錯誤：{e}")
 ##________________________________________________________

@@ -73,7 +73,8 @@ class EconomicScore(Base):
     signal_light = Column(String(10))
 #########################################
 # NewsArticle.__table__.drop(engine, checkfirst=True)
-Base.metadata.create_all(bind=engine)
+try:
+    Base.metadata.create_all(bind=engine)
     st.sidebar.info("📌 資料庫結構已完成同步")
 except Exception as schema_e:
     st.sidebar.error(f"結構同步失敗：{schema_e}")
@@ -81,7 +82,6 @@ except Exception as schema_e:
 # API 邏輯
 @st.cache_data(ttl=600)
 def fetch_stock_price_internal(symbol):
-# 直接執行 yfinance 
     try:
         stock = yf.Ticker(symbol)
         hist = stock.history(period="1mo")

@@ -280,6 +280,5 @@ pg = st.navigation([
     st.Page(show_main_charts, title="大盤指數圖", icon="⚖️"),
     st.Page(show_news_dashboard, title="美股新聞", icon="📰"),
 ])
-st.sidebar.title("toolssss")
 st.sidebar.markdown("---")
 pg.run()

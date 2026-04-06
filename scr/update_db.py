@@ -2,6 +2,7 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 import time
+import os 
 from sqlalchemy import create_engine, text
 
 USERNAME = "4RyYfQMvnH9DmYu.root"
@@ -15,7 +16,10 @@ if not os.path.exists("/etc/ssl/cert.pem"):
     ssl_args = {}
 #########################################################
 DATABASE_URL = f"mysql+pymysql://{USERNAME}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}?ssl_ca=/etc/ssl/cert.pem"
-engine = create_engine(DATABASE_URL)
+engine = create_engine(
+    DATABASE_URL,
+    connect_args={"ssl": {"fake_flag_to_enable_tls": True}}
+)
 
 def init_db():
     with engine.connect() as conn:

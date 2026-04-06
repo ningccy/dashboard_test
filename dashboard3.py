@@ -58,6 +58,7 @@ class NewsArticle(Base):
     content = Column(Text)
     sentiment_score = Column(Float)
     importance_score = Column(Float)
+    published = Column(String(100))
     created_at = Column(DateTime)
 
 class EconomicScore(Base):

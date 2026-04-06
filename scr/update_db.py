@@ -117,8 +117,9 @@ def fetch_and_sync_stock(symbol):
                     total_score = VALUES(total_score), 
                     signal_light = VALUES(signal_light)
             """)
-            if data_to_save:
-                print(f"準備寫入的第一筆範例資料：{data_to_save[0]}")
+            if len(data_to_save) > 0:
+                print("🚨 檢查點 - 準備寫入資料庫的第一筆數據內容：")
+                print(data_to_save[0])
             result = conn.execute(query, data_to_save)
             conn.commit()
             print(f"✅ {symbol} 同步完成，共寫入 {len(data_to_save)} 筆資料")

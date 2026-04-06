@@ -130,13 +130,13 @@ def show_main_charts():
 
     query = """
     SELECT 
-        score_date,
-        MAX(CASE WHEN symbol = '^DJI' THEN adj_close END) AS dow_jones,
-        MAX(CASE WHEN symbol = 'IWM' THEN adj_close END) AS russell_2000,
-        AVG(total_score) AS avg_score
-    FROM economic_score 
-    GROUP BY score_date
-    ORDER BY score_date ASC
+        `score_date`,
+        MAX(CASE WHEN `symbol` = '^DJI' THEN `adj_close` END) AS dow_jones,
+        MAX(CASE WHEN `symbol` = 'IWM' THEN `adj_close` END) AS russell_2000,
+        AVG(`total_score`) AS avg_score
+    FROM `economic_score` 
+    GROUP BY `score_date`
+    ORDER BY `score_date` ASC
     """
     
     try:

@@ -16,3 +16,5 @@ cryptography
 lxml
 lxml_html_clean
 newspaper4k
+sys
+os

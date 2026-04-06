@@ -78,10 +78,8 @@ try:
     st.sidebar.info("📌 資料庫結構已完成同步")
     if st.sidebar.button("🔄 立即抓取最新新聞"):
         with st.spinner("正在分析財經新聞中..."):
-            # 這裡假設你的爬蟲檔案名稱為 news_scraper.py
-            # 如果你的爬蟲檔案就在同一份檔案，則直接呼叫 main()
             try:
-                import news_scraper 
+                import for_news_main.py 
                 news_scraper.main()
                 st.sidebar.success("新聞更新完成！")
                 st.rerun() 

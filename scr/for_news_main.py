@@ -44,8 +44,8 @@ class NewsArticle(Base):
     created_at = Column(DateTime, default=datetime.now)
 
 RSS_FEEDS = {
-    'CNN Business': 'http://rss.cnn.com/rss/money_latest.rss',
-    'BBC Business': 'http://feeds.bbci.co.uk/news/business/rss.xml',
+    "CNN_Business": "http://rss.cnn.com/rss/money_latest.rss",
+    "BBC_Business": "http://feeds.bbci.co.uk/news/business/rss.xml",
     'Yahoo Finance': 'https://finance.yahoo.com/news/rssindex'
 }
 
@@ -77,6 +77,10 @@ def main():
                 ###############################################
             for entry in feed.entries[:10]:
                 link = entry.link
+                existing = db.query(NewsArticle).filter(NewsArticle.link == link).first()
+            if existing:
+                print(f"跳過重複: {link}")
+                continue
                 
                 if db.query(NewsArticle).filter(NewsArticle.link == link).first():
                     continue

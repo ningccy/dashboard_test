@@ -51,7 +51,7 @@ except Exception as e:
 
 class NewsArticle(Base):
     __tablename__ = "news_articles"
-     id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True)
     title = Column(String(255))
     link = Column(String(500), unique=True)
     source = Column(String(50))

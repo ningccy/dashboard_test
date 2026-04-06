@@ -10,11 +10,11 @@ PASSWORD = "XD2WuF9AcDymVeCt"
 HOST = "gateway01.ap-northeast-1.prod.aws.tidbcloud.com"
 PORT = "4000"
 DATABASE = "macro_monitor_1"
-#########################################################
+###
 ssl_args = {"ssl_ca": "/etc/ssl/cert.pem"}
 if not os.path.exists("/etc/ssl/cert.pem"):
     ssl_args = {}
-#########################################################
+###
 DATABASE_URL = f"mysql+pymysql://{USERNAME}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}?ssl_ca=/etc/ssl/cert.pem"
 engine = create_engine(
     DATABASE_URL,

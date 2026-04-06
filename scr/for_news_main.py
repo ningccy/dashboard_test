@@ -22,6 +22,7 @@ DATABASE_URL = (
 engine = create_engine(
     DATABASE_URL,
     pool_size=5,
+    pool_pre_ping=True,
     max_overflow=10,
     pool_recycle=3600,
     connect_args={"ssl": {"fake_flag_to_enable_tls": True}}
@@ -107,6 +108,15 @@ def main():
                 except Exception as e:
                     db.rollback()
                     print(f"❌ 解析失敗: {e}")
+    try:
+        db.add(new_news)
+        db.flush()   # 先把資料推到資料庫緩衝區
+        db.commit()  # 再正式存檔
+        print(f"✅ 寫入成功！")
+    except Exception as e:
+        db.rollback()
+        print(f"❌ 寫入失敗，原因：{e}")
+        
     finally:
         db.close()
     print("--- 任務結束 ---")

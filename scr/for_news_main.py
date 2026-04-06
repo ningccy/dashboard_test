@@ -74,16 +74,14 @@ def main():
             if db.query(NewsArticle).filter(NewsArticle.link == link).first():
                 print(f"跳過重複新聞: {title[:20]}") # 加這行確認是不是因為重複而跳過
                 continue
-                ###############################################
+            ##################################################
             for entry in feed.entries[:10]:
-                link = entry.link
-                existing = db.query(NewsArticle).filter(NewsArticle.link == link).first()
+            link = entry.link
+            
+            existing = db.query(NewsArticle).filter(NewsArticle.link == link).first()
             if existing:
-                print(f"跳過重複: {link}")
+                print(f"跳過重複: {link[:30]}...")
                 continue
-                
-                if db.query(NewsArticle).filter(NewsArticle.link == link).first():
-                    continue
 
                 try:
                     article = Article(link)
@@ -109,10 +107,12 @@ def main():
                     db.flush()
                     db.commit()
                     print(f"✅ 已匯入: {title[:30]}...")
+                    count += 1
                     time.sleep(1)
                 except Exception as e:
                     db.rollback()
                     print(f"❌ 解析失敗: {e}")
+                    continue
                     
     except Exception as big_e:
             print(f"💥 程式執行中斷: {big_e}")        

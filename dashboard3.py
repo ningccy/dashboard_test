@@ -78,17 +78,36 @@ class EconomicScore(Base):
 try:
     Base.metadata.create_all(bind=engine)
     st.sidebar.info("📌 資料庫結構已完成同步")
-    if st.sidebar.button("🔄 立即抓取最新新聞"):
-        with st.spinner("正在分析財經新聞中..."):
-            try:
-                from scr import for_news_main 
-                for_news_main.main()
-                st.sidebar.success("新聞更新完成！")
-                st.rerun() 
-            except Exception as e:
-                st.sidebar.error(f"抓取失敗：{e}")
 except Exception as schema_e:
     st.sidebar.error(f"結構同步失敗：{schema_e}")
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(current_dir, "scr")) 
+
+st.sidebar.title("管理員工具")
+if st.sidebar.button("🚀 立即更新大盤數據"):
+    with st.spinner("正在同步 yfinance 數據..."):
+        try:
+            import update_db
+            # 強制重新建立表以確保欄位正確
+            update_db.init_db() 
+            for stock in ["IWM", "^DJI"]:
+                update_db.fetch_and_sync_stock(stock)
+            st.sidebar.success("大盤數據同步完成！")
+            st.rerun()
+        except Exception as e:
+            st.sidebar.error(f"同步大盤失敗：{e}")
+
+if st.sidebar.button("🔄 立即抓取最新新聞"):
+    with st.spinner("正在分析財經新聞中..."):
+        try:
+            import for_news_main 
+            for_news_main.main()
+            st.sidebar.success("新聞更新完成！")
+            st.rerun() 
+        except Exception as e:
+            st.sidebar.error(f"抓取新聞失敗：{e}")
+                
 ####################    
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(current_dir, "scr"))

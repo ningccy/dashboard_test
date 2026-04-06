@@ -189,7 +189,7 @@ def show_news_dashboard():
 
     days = st.sidebar.slider("幾天內新聞？", 1, 30, 7)
     limit = st.sidebar.number_input("顯示數量", 5, 50, 10)
-    #################################################
+    
     if st.sidebar.button("🔄 立即抓取最新新聞"):
         with st.spinner("正在分析財經新聞中..."):
             try:
@@ -203,7 +203,7 @@ def show_news_dashboard():
                     st.sidebar.warning("⚠️ 抓取結束，但沒有新增新聞（可能皆為重複）。")
             except Exception as e:
                 st.sidebar.error(f"❌ 抓取失敗：{e}")
-                ###########################################################
+
     db = SessionLocal()
     try:
         now_local = datetime.now()
@@ -215,7 +215,7 @@ def show_news_dashboard():
             .limit(limit).all()
     
         if not top_news:
-            st.warning("所選範圍內尚無新聞資料。")
+            st.warning("所選範圍內尚無新聞資料，請點擊左側「立即抓取」按鈕。")
         else:
             for news in top_news:
                 with st.container():
@@ -226,11 +226,11 @@ def show_news_dashboard():
                         st.caption(f"來源: {news.source} | 情緒: {news.sentiment_score:.2f}")
                         with st.expander("內容摘要"):
                             st.write(news.content)
-                    st.divider()
+                    st.divider() 
     except Exception as e:
-            st.error(f"讀取新聞失敗：{e}")
-        finally:
-            db.close()
+        st.error(f"讀取新聞失敗：{e}")
+    finally:
+        db.close()
     
 pg = st.navigation([
     st.Page(show_economic_dashboard, title="經濟指標", icon="📈"),

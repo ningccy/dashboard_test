@@ -107,25 +107,6 @@ if st.sidebar.button("🔄 立即抓取最新新聞"):
             st.rerun() 
         except Exception as e:
             st.sidebar.error(f"抓取新聞失敗：{e}")
-                
-####################    
-current_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(current_dir, "scr"))
-try:
-    import update_db
-except ImportError:
-    import update_db
-
-if st.sidebar.button("🚀 立即更新大盤數據"):
-    with st.spinner("正在從 yfinance 抓取數據並寫入 TiDB..."):
-        try:
-            update_db.init_db() 
-            for stock in ["IWM", "^DJI"]:
-                update_db.fetch_and_sync_stock(stock)
-            st.sidebar.success("數據同步成功！請重新整理網頁。")
-            st.rerun() # 自動重新整理畫面
-        except Exception as e:
-            st.sidebar.error(f"同步失敗：{e}")
 
 #########################################
 # API 邏輯

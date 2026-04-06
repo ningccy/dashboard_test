@@ -51,15 +51,15 @@ except Exception as e:
 
 class NewsArticle(Base):
     __tablename__ = "news_articles"
-    id = Column(Integer, primary_key=True, index=True)
+     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(255))
-    link = Column(String(500))
+    link = Column(String(500), unique=True)
     source = Column(String(50))
     content = Column(Text)
     sentiment_score = Column(Float)
     importance_score = Column(Float)
     published = Column(String(100))
-    created_at = Column(DateTime)
+    created_at = Column(DateTime, default=datetime.now)
 
 class EconomicScore(Base):
     __tablename__ = "economic_score"

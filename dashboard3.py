@@ -197,6 +197,13 @@ def show_main_charts():
 def show_economic_dashboard():
     st.title("📊 經濟健康燈號 🚥")
     db = SessionLocal()
+    ########
+    def safe_float(value):
+        try:
+            return float(value) if value is not None else 0.0
+        except (TypeError, ValueError):
+            return 0.0
+    ########
     try: 
         dates = db.query(EconomicScore.score_date).distinct().order_by(EconomicScore.score_date.desc()).all()
         available_dates = [str(d.score_date) for d in dates]
@@ -212,7 +219,8 @@ def show_economic_dashboard():
 
             if data:
                 col1, col2 = st.columns(2)
-                col1.metric("綜合評分", f"{data.total_score:.1f}")
+                total_val = safe_float(getattr(data, 'total_score', 0))
+                col1.metric("綜合評分", f"{total_val:.1f}")
                 with col2:
                     sig = data.signal_light.upper()
                     if "RED" in sig:
@@ -226,14 +234,21 @@ def show_economic_dashboard():
                 st.subheader("指標組成細項...")
                 c1, c2, c3 = st.columns(3)
 
-                c1.metric("CPI 分數", f"{getattr(data, 'cpi_score', 0):.1f}")
-                c2.metric("PPI 分數", f"{getattr(data, 'ppi_score', 0):.1f}")
-                c3.metric("匯率分數", f"{getattr(data, 'fx_score', 0):.1f}")
+                cpi_val = safe_float(getattr(data, 'cpi_score', 0))
+                ppi_val = safe_float(getattr(data, 'ppi_score', 0))
+                fx_val = safe_float(getattr(data, 'fx_score', 0))
+
+                c1.metric("CPI 分數", f"{cpi_val:.1f}")
+                c2.metric("PPI 分數", f"{ppi_val:.1f}")
+                c3.metric("匯率分數", f"{fx_val:.1f}")
                 
-                with st.expander("指標說明:"):
+                with st.expander("📝 指標說明:"):
                     st.write("CPI 分數：反映消費者物價與市場通膨壓力 🛒")
                     st.write("PPI 分數：反映生產者成本與工業熱度 🏭")
                     st.write("匯率分數：反映當前匯率對市場的影響 💸")
+                    
+    except Exception as e:
+        st.error(f"載入數據時發生錯誤: {e}")
     finally:
         db.close()
 ############################################################

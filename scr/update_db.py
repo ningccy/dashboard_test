@@ -72,19 +72,11 @@ def fetch_and_sync_stock(symbol):
         import_data['symbol'] = symbol
         import_data['score_date'] = import_data.index.strftime('%Y-%m-%d')
 ###        
-        # 邏輯：利用 20 日價格變動率來模擬經濟通膨/生產熱度
-        roc20 = close_price.pct_change(periods=20) * 100
-        
-        # 模擬 CPI 分數：波動在合理範圍給高分，過度波動(通膨/通縮)分數降低
-        import_data['cpi_score'] = 80 - (roc20.abs() * 2) 
-        import_data['cpi_score'] = import_data['cpi_score'].clip(60, 95) # 限制區間
+       roc20 = close_price.pct_change(periods=20) * 100
 
-        # 模擬 PPI 分數：稍微跟隨 CPI 但權重不同
-        import_data['ppi_score'] = 75 - (roc20.abs() * 1.5)
-        import_data['ppi_score'] = import_data['ppi_score'].clip(60, 95)
-
-        # 模擬 FX 分數：這裡設定為一個相對穩定的基準值
-        import_data['fx_score'] = 70.0
+        import_data['cpi_score'] = (85 - roc20.abs() * 2).clip(60, 95)
+        import_data['ppi_score'] = (82 - roc20.abs() * 1.5).clip(60, 95)
+        import_data['fx_score'] = 75.0  # 匯率目前設定為穩定基準
 ###        
         import_data['total_score'] = np.where(close_price > ma200, 80.0, 60.0)
         import_data.loc[ma200.isna(), 'total_score'] = 70.0 
@@ -108,10 +100,10 @@ def fetch_and_sync_stock(symbol):
         with engine.connect() as conn:
             query = text("""
                 INSERT INTO economic_score (
-                    symbol, score_date, open, high, low, close, adj_close, volume, total_score, signal_light
+                    symbol, score_date, open, high, low, close, adj_close, volume, cpi_score, ppi_score, fx_score, total_score, signal_light
                 )
                 VALUES (
-                    :symbol, :score_date, :open, :high, :low, :close, :adj_close, :volume, :total_score, :signal_light
+                    :symbol, :score_date, :open, :high, :low, :close, :adj_close, :volume, :cpi_score, :ppi_score, :fx_score, :total_score, :signal_light
                 )
                 ON DUPLICATE KEY UPDATE 
                     open = VALUES(open),

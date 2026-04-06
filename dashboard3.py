@@ -1,4 +1,8 @@
 import streamlit as st
+st.cache_resource.clear()  # 強制清理資源緩存
+st.cache_data.clear()
+
+import streamlit as st
 from sqlalchemy import create_engine, Column, Integer, Float, String, Date, DateTime, Text, desc, text
 from sqlalchemy.orm import sessionmaker, declarative_base
 from datetime import datetime, timedelta

@@ -212,7 +212,7 @@ def show_news_dashboard():
                             st.write(news.content)
                 st.divider()
     ###############################################################################            
-        if st.sidebar.button("🔄 立即抓取最新新聞"):
+    if st.sidebar.button("🔄 立即抓取最新新聞"):
         with st.spinner("正在分析財經新聞中..."):
             try:
                 from scr import for_news_main 

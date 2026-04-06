@@ -14,7 +14,6 @@ DATABASE_URL = f"mysql+pymysql://{USERNAME}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}?
 engine = create_engine(DATABASE_URL)
 
 def init_db():
-    """確保資料表存在且欄位完整"""
     with engine.connect() as conn:
         conn.execute(text("""
             CREATE TABLE IF NOT EXISTS economic_score (

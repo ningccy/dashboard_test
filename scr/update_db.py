@@ -9,7 +9,11 @@ PASSWORD = "XD2WuF9AcDymVeCt"
 HOST = "gateway01.ap-northeast-1.prod.aws.tidbcloud.com"
 PORT = "4000"
 DATABASE = "macro_monitor_1"
-
+#########################################################
+ssl_args = {"ssl_ca": "/etc/ssl/cert.pem"}
+if not os.path.exists("/etc/ssl/cert.pem"):
+    ssl_args = {}
+#########################################################
 DATABASE_URL = f"mysql+pymysql://{USERNAME}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}?ssl_ca=/etc/ssl/cert.pem"
 engine = create_engine(DATABASE_URL)
 
@@ -97,9 +101,9 @@ def fetch_and_sync_stock(symbol):
                     total_score = VALUES(total_score), 
                     signal_light = VALUES(signal_light)
             """)
-            conn.execute(query, data_to_save)
-            conn.commit()        
-        print(f"✅ {symbol} 同步完成！")
+            result = conn.execute(query, data_to_save)
+            conn.commit()
+            print(f"✅ {symbol} 同步完成，共寫入 {len(data_to_save)} 筆資料")
 
     except Exception as e:
         print(f"❌ 同步 {symbol} 時發生錯誤：{e}")

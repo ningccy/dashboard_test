@@ -65,14 +65,17 @@ class NewsArticle(Base):
 
 class EconomicScore(Base):
     __tablename__ = "economic_score"
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True)
     symbol = Column(String(20))
     score_date = Column(Date)
-    cpi_score = Column(Float)
-    ppi_score = Column(Float)
-    fx_score = Column(Float)
+    open = Column(Float)
+    high = Column(Float)
+    low = Column(Float)
+    close = Column(Float)
+    adj_close = Column(Float)
+    volume = Column(Integer)
     total_score = Column(Float)
-    signal_light = Column(String(10))
+    signal_light = Column(String(20))
 #########################################
 # NewsArticle.__table__.drop(engine, checkfirst=True)
 try:

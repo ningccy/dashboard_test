@@ -15,7 +15,6 @@ try:
     if "mysql" in st.secrets:
         db_config = st.secrets["mysql"]
     else:
-        # 連線資訊作為後備
         db_config = {
             "user": "4RyYfQMvnH9DmYu.root",
             "password": "XD2WuF9AcDymVeCt",
@@ -74,6 +73,9 @@ class EconomicScore(Base):
     close = Column(Float)
     adj_close = Column(Float)
     volume = Column(Integer)
+    cpi_score = Column(Float)
+    ppi_score = Column(Float)
+    fx_score = Column(Float)
     total_score = Column(Float)
     signal_light = Column(String(20))
 #########################################
@@ -220,14 +222,18 @@ def show_economic_dashboard():
                     else:
                         st.success("🟢 穩健綠燈")
                 
-                with st.expander("查看詳細組成分數"):
-                    cpi = data.cpi_score if data.cpi_score is not None else "計算中..."
-                    ppi = data.ppi_score if data.ppi_score is not None else "計算中..."
-                    fx = data.fx_score if data.fx_score is not None else "計算中..."
-                    
-                    st.write(f"CPI 經濟分數: {cpi}")
-                    st.write(f"PPI 產出分數: {ppi}")
-                    st.write(f"匯率風險分數: {fx}")
+                st.divider()
+                st.subheader("指標組成細項...")
+                c1, c2, c3 = st.columns(3)
+
+                c1.metric("CPI 分數", f"{getattr(data, 'cpi_score', 0):.1f}")
+                c2.metric("PPI 分數", f"{getattr(data, 'ppi_score', 0):.1f}")
+                c3.metric("匯率分數", f"{getattr(data, 'fx_score', 0):.1f}")
+                
+                with st.expander("指標說明:"):
+                    st.write("CPI 分數：反映消費者物價與市場通膨壓力 🛒")
+                    st.write("PPI 分數：反映生產者成本與工業熱度 🏭")
+                    st.write("匯率分數：反映當前匯率對市場的影響 💸")
     finally:
         db.close()
 ############################################################

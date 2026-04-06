@@ -62,8 +62,8 @@ def calculate_importance(content, sentiment_score):
 
 def main():
     Base.metadata.create_all(bind=engine)
-    
     db = SessionLocal()
+    
     print("--- 開始抓取新聞 ---")
     try:
         for name, url in RSS_FEEDS.items():

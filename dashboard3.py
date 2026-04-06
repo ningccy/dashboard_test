@@ -4,6 +4,8 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 from datetime import datetime, timedelta
 import yfinance as yf
 import pandas as pd
+import sys
+import os
 
 st.set_page_config(page_title="經濟健康度儀表板", layout="wide")
 Base = declarative_base()
@@ -88,7 +90,12 @@ try:
 except Exception as schema_e:
     st.sidebar.error(f"結構同步失敗：{schema_e}")
 ####################    
-import update_db  # 確保你有 import 你的同步檔案
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(current_dir, "scr"))
+try:
+    import update_db
+except ImportError:
+    import update_db
 
 if st.sidebar.button("🚀 立即更新大盤數據"):
     with st.spinner("正在從 yfinance 抓取數據並寫入 TiDB..."):

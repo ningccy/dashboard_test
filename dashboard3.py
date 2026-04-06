@@ -80,7 +80,7 @@ try:
         with st.spinner("正在分析財經新聞中..."):
             try:
                 from scr import for_news_main 
-                news_scraper.main()
+                for_news_main.main()
                 st.sidebar.success("新聞更新完成！")
                 st.rerun() 
             except Exception as e:

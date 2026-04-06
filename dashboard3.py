@@ -221,13 +221,13 @@ def show_economic_dashboard():
                         st.success("🟢 穩健綠燈")
                 
                 with st.expander("查看詳細組成分數"):
-                    cpi = getattr(data, 'cpi_score', "無資料")
-                    ppi = getattr(data, 'ppi_score', "無資料")
-                    fx = getattr(data, 'fx_score', "無資料")
+                    cpi = data.cpi_score if data.cpi_score is not None else "計算中..."
+                    ppi = data.ppi_score if data.ppi_score is not None else "計算中..."
+                    fx = data.fx_score if data.fx_score is not None else "計算中..."
                     
-                    st.write(f"CPI 分數: {cpi}")
-                    st.write(f"PPI 分數: {ppi}")
-                    st.write(f"匯率分數: {fx}")
+                    st.write(f"CPI 經濟分數: {cpi}")
+                    st.write(f"PPI 產出分數: {ppi}")
+                    st.write(f"匯率風險分數: {fx}")
     finally:
         db.close()
 ############################################################

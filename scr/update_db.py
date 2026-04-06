@@ -72,11 +72,10 @@ def fetch_and_sync_stock(symbol):
         import_data['symbol'] = symbol
         import_data['score_date'] = import_data.index.strftime('%Y-%m-%d')
 ###        
-       roc20 = close_price.pct_change(periods=20) * 100
-
+        roc20 = close_price.pct_change(periods=20) * 100
         import_data['cpi_score'] = (85 - roc20.abs() * 2).clip(60, 95)
-        import_data['ppi_score'] = (82 - roc20.abs() * 1.5).clip(60, 95)
-        import_data['fx_score'] = 75.0  # 匯率目前設定為穩定基準
+        import_data['ppi_score'] = (80 - roc20.abs() * 1.5).clip(60, 95)
+        import_data['fx_score'] = 75.0  # 模擬固定分數
 ###        
         import_data['total_score'] = np.where(close_price > ma200, 80.0, 60.0)
         import_data.loc[ma200.isna(), 'total_score'] = 70.0 

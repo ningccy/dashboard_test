@@ -79,7 +79,7 @@ try:
     if st.sidebar.button("🔄 立即抓取最新新聞"):
         with st.spinner("正在分析財經新聞中..."):
             try:
-                from src import for_news_main 
+                from scr import for_news_main 
                 news_scraper.main()
                 st.sidebar.success("新聞更新完成！")
                 st.rerun() 

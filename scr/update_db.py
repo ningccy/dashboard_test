@@ -65,10 +65,6 @@ def fetch_and_sync_stock(symbol):
         
         close_price = import_data['Adj Close']
         ma200 = close_price.rolling(window=200).mean()
-        #######################################################################
-        data = yf.download(symbol, period="1d")
-        adj_close = data['Adj Close'].iloc[-1] if not data.empty else 0
-        #########################################################################
         
         import_data['symbol'] = symbol
         import_data['score_date'] = import_data.index.strftime('%Y-%m-%d')

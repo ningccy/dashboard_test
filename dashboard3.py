@@ -211,6 +211,22 @@ def show_news_dashboard():
                         with st.expander("內容摘要"):
                             st.write(news.content)
                 st.divider()
+    ###############################################################################            
+        if st.sidebar.button("🔄 立即抓取最新新聞"):
+        with st.spinner("正在分析財經新聞中..."):
+            try:
+                from scr import for_news_main 
+                # 取得回傳的抓取數量
+                num_imported = for_news_main.main() 
+                
+                if num_imported > 0:
+                    st.sidebar.success(f"新聞更新完成！共抓取 {num_imported} 則")
+                    st.rerun() 
+                else:
+                    st.sidebar.warning("抓取結束，但資料庫沒有新增任何新聞（可能皆為重複）。")
+            except Exception as e:
+                st.sidebar.error(f"抓取失敗，錯誤訊息：{e}")
+   ################################################################################ 
     finally:
         db.close()
     

@@ -69,7 +69,11 @@ def main():
         for name, url in RSS_FEEDS.items():
             print(f"正在掃描 {name}...")
             feed = feedparser.parse(url)
-
+            ####################################################
+            if db.query(NewsArticle).filter(NewsArticle.link == link).first():
+                print(f"跳過重複新聞: {title[:20]}") # 加這行確認是不是因為重複而跳過
+                continue
+                ###############################################
             for entry in feed.entries[:10]:
                 link = entry.link
                 

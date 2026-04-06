@@ -169,16 +169,16 @@ def show_economic_dashboard():
                     st.write(f"匯率分數: {data.fx_score}")
     finally:
         db.close()
-
+############################################################
 def show_news_dashboard():
     st.title("📰 美股精選新聞 💰")
 
     days = st.sidebar.slider("幾天內新聞？", 1, 30, 7)
     limit = st.sidebar.number_input("顯示數量", 5, 50, 10)
-############################################################
     db = SessionLocal()
     try:
-        time_threshold = datetime.now() - timedelta(days=days)
+        now_local = datetime.now()
+        time_threshold = now_local - timedelta(days=days)
         top_news = db.query(NewsArticle) \
             .filter(NewsArticle.created_at >= time_threshold) \
             .order_by(desc(NewsArticle.importance_score)) \

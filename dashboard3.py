@@ -72,9 +72,8 @@ class EconomicScore(Base):
     total_score = Column(Float)
     signal_light = Column(String(10))
 #########################################
-   # Base.metadata.create_all(bind=engine)
-NewsArticle.__table__.drop(engine, checkfirst=True)
-    Base.metadata.create_all(bind=engine)
+# NewsArticle.__table__.drop(engine, checkfirst=True)
+Base.metadata.create_all(bind=engine)
     st.sidebar.info("📌 資料庫結構已完成同步")
 except Exception as schema_e:
     st.sidebar.error(f"結構同步失敗：{schema_e}")

@@ -101,16 +101,6 @@ if st.sidebar.button("🚀 立即更新大盤數據"):
             st.rerun()
         except Exception as e:
             st.sidebar.error(f"同步大盤失敗：{e}")
-
-if st.sidebar.button("💡 立即抓取最新新聞"):
-    with st.spinner("正在分析財經新聞中..."):
-        try:
-            import for_news_main 
-            for_news_main.main()
-            st.sidebar.success("新聞更新完成！")
-            st.rerun() 
-        except Exception as e:
-            st.sidebar.error(f"抓取新聞失敗：{e}")
             
 if st.sidebar.button("💱 立即同步匯率數據"):
     with st.spinner("正在獲取 USD/TWD 匯率..."):
@@ -288,7 +278,7 @@ def show_news_dashboard():
     days = st.sidebar.slider("幾天內新聞？", 1, 30, 7)
     limit = st.sidebar.number_input("顯示數量", 5, 50, 10)
     
-    if st.sidebar.button("🔄 立即抓取最新新聞"):
+    if st.sidebar.button("💡 立即抓取最新新聞"):
         with st.spinner("正在分析財經新聞中..."):
             try:
                 from scr import for_news_main 

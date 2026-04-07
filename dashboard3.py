@@ -149,7 +149,25 @@ for i, symbol in enumerate(target_stocks):
             st.info(f"等待 {symbol}...")
 
 st.divider()
-##________________________________________________________________
+#####################################################################
+def get_fx_data():
+    query = "SELECT date, close_price FROM exchange_rates ORDER BY date ASC"
+    df = pd.read_sql(query, engine)
+    df['date'] = pd.to_datetime(df['date'])
+    return df
+st.title("美元對新台幣 (USD/TWD) 走勢圖")
+
+fx_df = get_fx_data()
+
+if not fx_df.empty:
+
+    st.line_chart(fx_df.set_index('date')['close_price'])
+    
+    # 更精緻的圖表 (包含數值標記)
+    st.area_chart(fx_df.set_index('date'))
+else:
+    st.warning("目前資料庫中沒有匯率數據，請執行爬蟲程式。")
+####################################################################
 def show_main_charts():
     st.title("⚖️ 大盤指數圖 🔍")
 
@@ -193,7 +211,7 @@ def show_main_charts():
 
     except Exception as e:
         st.error(f"繪圖發生錯誤：{e}")
-##________________________________________________________
+##########################################################################
 def show_economic_dashboard():
     st.title("📊 經濟健康燈號 🚥")
     db = SessionLocal()

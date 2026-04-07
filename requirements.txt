@@ -10,7 +10,7 @@ pymysql
 pymongo
 feedparser
 textblob
-newspaper3k
+newspaper4k
 dotenv
 cryptography
 lxml

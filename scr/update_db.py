@@ -148,10 +148,10 @@ def fetch_and_sync_stock(symbol):
         print(f"❌ 同步 {symbol} 時發生錯誤：{e}")
         
 def get_signal(score):
-    if score >= 85: return 'green'  # 極佳
-    elif score >= 75: return 'blue' # 穩定
-    elif score >= 65: return 'yellow' # 警告
-    else: return 'red' # 危險
+    if score >= 85: return 'green'  
+    elif score >= 75: return 'blue' 
+    elif score >= 65: return 'yellow'
+    else: return 'red' 
 
 if __name__ == "__main__":
     init_db()

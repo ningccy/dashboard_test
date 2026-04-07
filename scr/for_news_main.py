@@ -1,17 +1,4 @@
-import sys
-import types
-import os
 
-# --- 強制注入 newspaper 缺失的設定 ---
-# 建立一個模擬的 settings 模組，避免 Python 3.14 的匯入錯誤
-nps = types.ModuleType('newspaper.settings')
-nps.CACHE_DIRECTORY = os.path.join(os.path.expanduser("~"), ".newspaper_cache")
-nps.POPULAR_URLS = os.path.join(os.path.expanduser("~"), ".newspaper_pwl")
-nps.DATA_DIRECTORY = os.path.join(os.path.expanduser("~"), ".newspaper_data")
-
-# 將模擬模組掛載到系統路徑中
-sys.modules['newspaper.settings'] = nps
-# ------------------------------------
 import feedparser
 from newspaper import Article
 from textblob import TextBlob

@@ -94,7 +94,6 @@ if st.sidebar.button("🚀 立即更新大盤數據"):
     with st.spinner("正在同步 yfinance 數據..."):
         try:
             import update_db
-            # 強制重新建立表以確保欄位正確
             update_db.init_db() 
             for stock in ["IWM", "^DJI"]:
                 update_db.fetch_and_sync_stock(stock)
@@ -208,11 +207,9 @@ def show_main_charts():
         df = df.set_index('score_date')
 
         st.subheader("📊 大盤指數走勢")
-        tab1, tab2 = st.tabs(["絕對數值", "漲跌幅對比 (%)"])
-        
+        tab1, tab2 = st.tabs(["絕對數值", "漲跌幅對比 (%)"]) 
         with tab1:
-            st.line_chart(df[['dow_jones', 'russell_2000']])
-            
+            st.line_chart(df[['dow_jones', 'russell_2000']])          
         with tab2:
             norm_df = df[['dow_jones', 'russell_2000']].copy()
             norm_df = (norm_df / norm_df.iloc[0] - 1) * 100

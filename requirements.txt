@@ -14,5 +14,5 @@ dotenv
 cryptography
 lxml
 lxml_html_clean
-newspaper4k==0.9.3
+newspaper4k
 

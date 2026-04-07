@@ -179,11 +179,7 @@ st.title("美元對:新台幣 (USD/TWD) 走勢圖")
 fx_df = get_fx_data()
 
 if not fx_df.empty:
-
     st.line_chart(fx_df.set_index('date')['close_price'])
-    
-    # 更精緻的圖表 (包含數值標記)
-    st.area_chart(fx_df.set_index('date'))
 else:
     st.warning("目前資料庫中沒有匯率數據，請執行爬蟲程式。")
 ####################################################################

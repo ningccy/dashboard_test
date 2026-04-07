@@ -1,22 +1,36 @@
 import yfinance as yf
+import pandas as pd
+from sqlalchemy import create_engine
 import time
-import random
 
-tickers = ["TWD=X"] # 美元對新台幣匯率 (2005~2014抓第一批，2015~2024抓第二批)
-start_year = 2015
-end_year = 2025
+DB_USER = "4RyYfQMvnH9DmYu.root"
+DB_PASSWORD = "XD2WuF9AcDymVeCt"
+DB_HOST = "gateway01.ap-northeast-1.prod.aws.tidbcloud.com"
+DB_PORT = "4000"
+DB_NAME = "macro_monitor_1"
 
-for year in range(start_year, end_year + 1):
-    print(f"正在抓取 {year} 年資料...")
+DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}?ssl_verify_cert=true&ssl_verify_identity=true"
+engine = create_engine(DATABASE_URL, connect_args={"ssl": {"fake_flag_to_enable_tls": True}})
+
+def sync_exchange_rates():
+    print("--- 開始同步匯率資料 ---")
+    df = yf.download("TWD=X", start="2015-01-01", end="2026-12-31")
+    
+    if df.empty:
+        print("未抓取到資料")
+        return
+
+    df = df[['Close']].reset_index()
+    df.columns = ['date', 'close_price']
+    df['ticker'] = "TWD=X"
+    
+    # 寫入資料庫 (if_exists='append' 表示附加，搭配 UNIQUE 索引可防止重複)
+    # 註：這裡使用 to_sql 是最快的方式
     try:
-        data = yf.download("TWD=X", start=f"{year}-01-01", end=f"{year}-12-31")
-        data.to_csv(f"USD_TWD_{year}.csv")
-
-        # 關鍵：隨機休息 5~15 秒，模擬真人的行為
-        wait_time = random.uniform(5, 15)
-        print(f"成功，休息 {wait_time:.1f} 秒...")
-        time.sleep(wait_time)
-
+        df.to_sql('exchange_rates', con=engine, if_exists='append', index=False)
+        print(f" {len(df)} 筆匯率資料")
     except Exception as e:
-        print(f"{year} 年抓取出錯: {e}")
-        break # 如果被封鎖就停止，避免被永久封鎖
+        print(f"部分資料已存在或寫入失敗: {e}")
+
+if __name__ == "__main__":
+    sync_exchange_rates()

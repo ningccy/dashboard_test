@@ -24,8 +24,6 @@ def sync_exchange_rates():
     df.columns = ['date', 'close_price']
     df['ticker'] = "TWD=X"
     
-    # 寫入資料庫 (if_exists='append' 表示附加，搭配 UNIQUE 索引可防止重複)
-    # 註：這裡使用 to_sql 是最快的方式
     try:
         df.to_sql('exchange_rates', con=engine, if_exists='append', index=False)
         print(f" {len(df)} 筆匯率資料")

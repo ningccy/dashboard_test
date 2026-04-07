@@ -98,7 +98,6 @@ def main():
                         link  =link,
                         source = name,
                         content = clean_content,
-                        content = article.text.strip(),
                         sentiment_score = sent_score,
                         importance_score = imp_score,
                         published = entry.get('published', ''),

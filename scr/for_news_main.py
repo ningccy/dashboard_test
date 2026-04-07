@@ -1,4 +1,13 @@
+import sys
+import os
 
+# --- 強制修復 newspaper 內部錯誤 ---
+import types
+# 建立一個假的 settings 模組，防止 newspaper 內部崩潰
+m = types.ModuleType('newspaper.settings')
+m.CACHE_DIRECTORY = os.path.join(os.path.expanduser("~"), ".newspaper_cache")
+sys.modules['newspaper.settings'] = m
+##########################################################
 import feedparser
 from newspaper import Article
 from textblob import TextBlob

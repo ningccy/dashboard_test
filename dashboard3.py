@@ -155,7 +155,7 @@ def get_fx_data():
     df = pd.read_sql(query, engine)
     df['date'] = pd.to_datetime(df['date'])
     return df
-st.title("美元對新台幣 (USD/TWD) 走勢圖")
+st.title("美元對:新台幣 (USD/TWD) 走勢圖")
 
 fx_df = get_fx_data()
 

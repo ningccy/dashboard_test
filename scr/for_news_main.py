@@ -87,20 +87,22 @@ def main():
                     article.parse()
 
                     title = entry.title
-                    content = article.text
+                    clean_content = article.text.strip()[:500]
                     sent_score = get_sentiment(title)
-                    imp_score = calculate_importance(content, sent_score)
+                    imp_score = calculate_importance(clean_content, sent_score)
+                    content = article.text
+
 
                     new_news = NewsArticle(
-                        title=title[:250],
-                        link=link,
-                        source=name,
-                        content = article.text.strip()
-                        content=content[:500],
-                        sentiment_score=sent_score,
-                        importance_score=imp_score,
-                        published=entry.get('published', ''),
-                        created_at=datetime.now()
+                        title = title[:250],
+                        link  =link,
+                        source = name,
+                        content = clean_content,
+                        content = article.text.strip(),
+                        sentiment_score = sent_score,
+                        importance_score = imp_score,
+                        published = entry.get('published', ''),
+                        created_at = datetime.now()
                     )                    
                     db.add(new_news)
                     db.commit()

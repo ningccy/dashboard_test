@@ -1,14 +1,4 @@
-import sys
-import os
 
-# 強制在套件載入前模擬舊版的 settings 變數，防止報錯
-try:
-    import newspaper.settings as nps
-    if not hasattr(nps, 'CACHE_DIRECTORY'):
-        nps.CACHE_DIRECTORY = os.path.join(os.path.expanduser("~"), ".newspaper_cache")
-except ImportError:
-    pass
-#################################################################
 import feedparser
 from newspaper import Article
 from textblob import TextBlob
@@ -132,6 +122,5 @@ def main():
         print(f"--- 任務結束，共抓取 {count} 則新聞 ---")
     
     return count
-
 if __name__ == "__main__":
     main()

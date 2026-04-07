@@ -72,18 +72,36 @@ def fetch_and_sync_stock(symbol):
         import_data['symbol'] = symbol
         import_data['score_date'] = import_data.index.strftime('%Y-%m-%d')
 ###        
+        close_price = import_data['Adj Close']
+        ma200 = close_price.rolling(window=200).mean()
+        # 20日變動率 (百分比)
         roc20 = close_price.pct_change(periods=20) * 100
-        import_data['cpi_score'] = (85 - roc20.abs() * 2).clip(60, 95)
-        import_data['ppi_score'] = (80 - roc20.abs() * 1.5).clip(60, 95)
-        import_data['fx_score'] = 75.0  # 模擬固定分數
-###        
-        import_data['total_score'] = np.where(close_price > ma200, 80.0, 60.0)
-        import_data.loc[ma200.isna(), 'total_score'] = 70.0 
-        
-        import_data['signal_light'] = import_data['total_score'].apply(
-            lambda x: 'green' if x >= 80 else 'yellow'
-        )
+        # 計算波動率 (20日標準差)，反映市場不安定感
+        volatility = roc20.rolling(window=20).std()
 
+        # --- 1. CPI 分數邏輯 (穩定性優先) ---
+        # 基礎分 80，當波動率增加時扣分，最高 95，最低 60
+        import_data['cpi_score'] = (80 - volatility * 2).clip(60, 95)
+
+        # --- 2. PPI 分數邏輯 (與大盤趨勢掛鉤) ---
+        # 若股價在均線之上，基數較高；反之較低
+        ppi_base = np.where(close_price > ma200, 85, 70)
+        import_data['ppi_score'] = (ppi_base - roc20.abs()).clip(60, 95)
+
+        # --- 3. FX 分數邏輯 (匯率乖離率) ---
+        # 如果 symbol 是匯率 TWD=X，計算偏離年線的程度
+        # 假設美元太強 (偏離 MA200 > 5%) 對經濟體系是壓力，扣分
+        bias_200 = ((close_price - ma200) / ma200) * 100
+        import_data['fx_score'] = (85 - bias_200.abs() * 3).fillna(75.0).clip(60, 95)
+
+        # --- 4. Total Score 綜合評分 ---
+        # 給予不同權重：例如 CPI(40%) + PPI(30%) + FX(30%)
+        import_data['total_score'] = (
+            import_data['cpi_score'] * 0.4 + 
+            import_data['ppi_score'] * 0.3 + 
+            import_data['fx_score'] * 0.3
+        )
+        
         rename_map = {
             'Open': 'open', 'High': 'high', 'Low': 'low', 
             'Close': 'close', 'Adj Close': 'adj_close', 'Volume': 'volume'
@@ -126,6 +144,14 @@ def fetch_and_sync_stock(symbol):
 
     except Exception as e:
         print(f"❌ 同步 {symbol} 時發生錯誤：{e}")
+        
+def get_signal(score):
+            if score >= 85: return 'green'  # 極佳
+            elif score >= 75: return 'blue' # 穩定
+            elif score >= 65: return 'yellow' # 警告
+            else: return 'red' # 危險
+
+        import_data['signal_light'] = import_data['total_score'].apply(get_signal)
 
 if __name__ == "__main__":
     init_db()

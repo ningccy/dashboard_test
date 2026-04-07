@@ -103,7 +103,7 @@ if st.sidebar.button("🚀 立即更新大盤數據"):
         except Exception as e:
             st.sidebar.error(f"同步大盤失敗：{e}")
 
-if st.sidebar.button("🔄 立即抓取最新新聞"):
+if st.sidebar.button("💡 立即抓取最新新聞"):
     with st.spinner("正在分析財經新聞中..."):
         try:
             import for_news_main 
@@ -112,7 +112,26 @@ if st.sidebar.button("🔄 立即抓取最新新聞"):
             st.rerun() 
         except Exception as e:
             st.sidebar.error(f"抓取新聞失敗：{e}")
-
+            
+if st.sidebar.button("💱 立即同步匯率數據"):
+    with st.spinner("正在獲取 USD/TWD 匯率..."):
+        try:
+            import yfinance as yf
+            fx_data = yf.download("TWD=X", start="2015-01-01")
+            
+            if not fx_data.empty:
+                fx_df = fx_data[['Close']].reset_index()
+                fx_df.columns = ['date', 'close_price']
+                fx_df['ticker'] = "TWD=X"
+                
+                fx_df.to_sql('exchange_rates', con=engine, if_exists='replace', index=False)
+                
+                st.sidebar.success("匯率同步完成！")
+                st.rerun()
+            else:
+                st.sidebar.warning("Yahoo Finance 未回傳匯率資料")
+        except Exception as e:
+            st.sidebar.error(f"同步匯率失敗：{e}")
 #########################################
 # API 邏輯
 @st.cache_data(ttl=600)

@@ -101,6 +101,8 @@ def fetch_and_sync_stock(symbol):
             import_data['ppi_score'] * 0.3 + 
             import_data['fx_score'] * 0.3
         )
+
+        import_data['signal_light'] = import_data['total_score'].apply(get_signal)
         
         rename_map = {
             'Open': 'open', 'High': 'high', 'Low': 'low', 
@@ -146,12 +148,10 @@ def fetch_and_sync_stock(symbol):
         print(f"❌ 同步 {symbol} 時發生錯誤：{e}")
         
 def get_signal(score):
-            if score >= 85: return 'green'  # 極佳
-            elif score >= 75: return 'blue' # 穩定
-            elif score >= 65: return 'yellow' # 警告
-            else: return 'red' # 危險
-
-        import_data['signal_light'] = import_data['total_score'].apply(get_signal)
+    if score >= 85: return 'green'  # 極佳
+    elif score >= 75: return 'blue' # 穩定
+    elif score >= 65: return 'yellow' # 警告
+    else: return 'red' # 危險
 
 if __name__ == "__main__":
     init_db()

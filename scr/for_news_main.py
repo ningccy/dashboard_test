@@ -101,8 +101,7 @@ def main():
                         importance_score=imp_score,
                         published=entry.get('published', ''),
                         created_at=datetime.now()
-                    )
-                    
+                    )                    
                     db.add(new_news)
                     db.commit()
                     

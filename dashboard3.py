@@ -275,7 +275,7 @@ def show_economic_dashboard():
                 c2.metric("PPI 分數", f"{ppi_val:.1f}")
                 c3.metric("匯率分數", f"{fx_val:.1f}")
                 
-                with st.expander("📝 指標說明:"):
+                with st.expander("指標說明:"):
                     st.write("CPI 分數：反映消費者物價與市場通膨壓力 🛒")
                     st.write("PPI 分數：反映生產者成本與工業熱度 🏭")
                     st.write("匯率分數：反映當前匯率對市場的影響 💸")

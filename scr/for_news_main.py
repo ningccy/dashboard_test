@@ -1,3 +1,14 @@
+import sys
+import os
+
+# 強制在套件載入前模擬舊版的 settings 變數，防止報錯
+try:
+    import newspaper.settings as nps
+    if not hasattr(nps, 'CACHE_DIRECTORY'):
+        nps.CACHE_DIRECTORY = os.path.join(os.path.expanduser("~"), ".newspaper_cache")
+except ImportError:
+    pass
+#################################################################
 import feedparser
 from newspaper import Article
 from textblob import TextBlob
@@ -81,7 +92,7 @@ def main():
                     continue 
 
                 try:
-                    article = Article(link)
+                    article = Article(link,language='en')
                     article.download()
                     article.parse()
 
@@ -94,6 +105,7 @@ def main():
                         title=title[:250],
                         link=link,
                         source=name,
+                        content = article.text.strip()
                         content=content[:500],
                         sentiment_score=sent_score,
                         importance_score=imp_score,

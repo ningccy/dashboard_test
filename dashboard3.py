@@ -11,7 +11,6 @@ st.set_page_config(page_title="經濟健康度儀表板", layout="wide")
 Base = declarative_base()
 
 try:
-
     if "mysql" in st.secrets:
         db_config = st.secrets["mysql"]
     else:
@@ -22,13 +21,11 @@ try:
             "port": "4000",
             "database": "macro_monitor_1"
         }
-
     DATABASE_URL = (
         f"mysql+pymysql://{db_config['user']}:{db_config['password']}@"
         f"{db_config['host']}:{db_config['port']}/{db_config['database']}"
         f"?ssl_verify_cert=true&ssl_verify_identity=true"
     )
-
     engine = create_engine(
  
         DATABASE_URL,
@@ -48,7 +45,6 @@ try:
 except Exception as e:
     st.error(f"❌ 資料庫連線失敗：{e}")
     st.stop()
-
 
 class NewsArticle(Base):
     __tablename__ = "news_articles"

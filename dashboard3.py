@@ -134,7 +134,7 @@ def fetch_stock_price_internal(symbol):
         }
     except:
         return None
-
+#---------------------------------------------------------------------------------------------------------------------------------修改
 st.subheader("🔥 熱門標的即時監控")
 target_stocks = ["NVDA", "TSLA", "COST", "BA"] 
 stock_cols = st.columns(len(target_stocks))

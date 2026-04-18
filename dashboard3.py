@@ -78,8 +78,7 @@ class EconomicScore(Base):
     fx_score = Column(Float)
     total_score = Column(Float)
     signal_light = Column(String(20))
-#########################################
-# NewsArticle.__table__.drop(engine, checkfirst=True)
+
 try:
     Base.metadata.create_all(bind=engine)
     st.sidebar.info("📌 資料庫結構已完成同步")
@@ -121,7 +120,7 @@ if st.sidebar.button("💱 立即同步匯率數據"):
                 st.sidebar.warning("Yahoo Finance 未回傳匯率資料")
         except Exception as e:
             st.sidebar.error(f"同步匯率失敗：{e}")
-#########################################
+
 # API 邏輯
 @st.cache_data(ttl=600)
 def fetch_stock_price_internal(symbol):

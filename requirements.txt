@@ -15,4 +15,5 @@ cryptography
 lxml
 lxml_html_clean
 newspaper4k
-transformers torch
+transformers>=4.30.0
+torch>=2.0.0

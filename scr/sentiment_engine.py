@@ -1,4 +1,4 @@
-from transformers import BertTokenizer, BertForSequenceClassification
+from transformers import BertTokenizer, BertForSequenceClassification 
 from transformers import pipeline
 import torch
 

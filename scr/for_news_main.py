@@ -5,6 +5,8 @@ from datetime import datetime
 import time
 from sqlalchemy import create_engine, Column, Integer, Float, String, DateTime, Text
 from sqlalchemy.orm import sessionmaker, declarative_base
+import torch
+from transformers import pipeline
 
 DB_USER = "4RyYfQMvnH9DmYu.root"
 DB_PASSWORD = "XD2WuF9AcDymVeCt"
@@ -30,6 +32,8 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
+finbert = pipeline("sentiment-analysis", model="yiyanghkust/finbert-tone")
+
 class NewsArticle(Base):
     __tablename__ = "news_articles"
     id = Column(Integer, primary_key=True, index=True)
@@ -37,7 +41,8 @@ class NewsArticle(Base):
     link = Column(String(500), unique=True)
     source = Column(String(50))
     content = Column(Text)
-    sentiment_score = Column(Float)
+    sentiment_score = Column(Float)      
+    sentiment_textblob = Column(Float)
     importance_score = Column(Float)
     published = Column(String(100))
     created_at = Column(DateTime, default=datetime.now)
@@ -47,12 +52,19 @@ RSS_FEEDS = {
     "BBC_Business": "http://feeds.bbci.co.uk/news/business/rss.xml",
     'Yahoo Finance': 'https://finance.yahoo.com/news/rssindex'
 }
-
+##################################################################
 def get_sentiment(text):
-    blob = TextBlob(text)
-    polarity = blob.sentiment.polarity
-    return (polarity + 1) / 2 
+    blob_polarity = TextBlob(text).sentiment.polarity
+    tb_score = (blob_polarity + 1) / 2
 
+    try:
+        res = finbert(text[:512])[0] #  上限 512 tokens
+        label_map = {'Positive': 1, 'Negative': 0, 'Neutral': 0.5}
+        fb_score = label_map.get(res['label'], 0.5)
+    except:
+        fb_score = tb_score # Fallback 備援
+    return fb_score, tb_score
+###################################################################
 def calculate_importance(content, sentiment_score):
     keywords = ['fed','surge','rally','ATH','outperform','plunge','plummet','sell-out','slide','dip','guidance','bullish','bearish','blue-chip','ipo','hawkish','dovish','fomc','YTD','YoY','QoQ','inflation','rate cut','earnings','nasdaq','s&p 500','DJIA','QQQ','apple','meta','google','nvidia']
     hit_count = sum(1 for word in keywords if word in content.lower())

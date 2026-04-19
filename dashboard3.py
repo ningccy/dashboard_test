@@ -54,6 +54,7 @@ class NewsArticle(Base):
     source = Column(String(50))
     content = Column(Text)
     sentiment_score = Column(Float)
+    sentiment_textblob = Column(Float)
     importance_score = Column(Float)
     published = Column(String(100))
     created_at = Column(DateTime, default=datetime.now)
@@ -83,8 +84,8 @@ except Exception as schema_e:
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(current_dir, "scr")) 
-
-st.sidebar.title("管理員工具")
+##-----------------------------------------------------------
+st.sidebar.title("- 跟上世界的按鈕 -")
 if st.sidebar.button("🚀 立即更新大盤數據"):
     with st.spinner("正在同步 yfinance 數據..."):
         try:
@@ -96,7 +97,7 @@ if st.sidebar.button("🚀 立即更新大盤數據"):
             st.rerun()
         except Exception as e:
             st.sidebar.error(f"同步大盤失敗：{e}")
-            
+###            
 if st.sidebar.button("💱 立即同步匯率數據"):
     with st.spinner("正在獲取 USD/TWD 匯率..."):
         try:
@@ -116,7 +117,20 @@ if st.sidebar.button("💱 立即同步匯率數據"):
                 st.sidebar.warning("Yahoo Finance 未回傳匯率資料")
         except Exception as e:
             st.sidebar.error(f"同步匯率失敗：{e}")
-
+###
+if st.sidebar.button("💡 立即抓取最新新聞"):
+    with st.spinner("FinBERT 正在深度分析中..."):
+        try:
+            from scr import for_news_main 
+            num_imported = for_news_main.main() 
+            if num_imported and num_imported > 0:
+                st.sidebar.success(f"新聞更新完成！共抓取 {num_imported} 則")
+                st.rerun() 
+            else:
+                st.sidebar.warning("無新增新聞（可能皆為重複）。")
+        except Exception as e:
+            st.sidebar.error(f"❌ 抓取失敗：{e}")
+##---------------------------------------------------------------------
 # API 邏輯
 @st.cache_data(ttl=600)
 def fetch_stock_price_internal(symbol):
@@ -134,7 +148,7 @@ def fetch_stock_price_internal(symbol):
         }
     except:
         return None
-#---------------------------------------------------------------------------------------------------------------------------------修改
+#---------------------------------------------------------------------------------------------------------------修改
 st.subheader("🔥 熱門標的即時監控")
 target_stocks = ["NVDA", "TSLA", "COST", "BA"] 
 stock_cols = st.columns(len(target_stocks))
@@ -212,13 +226,13 @@ def show_main_charts():
 def show_economic_dashboard():
     st.title("📊 經濟健康燈號 🚥")
     db = SessionLocal()
-    ########
+
     def safe_float(value):
         try:
             return float(value) if value is not None else 0.0
         except (TypeError, ValueError):
             return 0.0
-    ########
+
     try: 
         dates = db.query(EconomicScore.score_date).distinct().order_by(EconomicScore.score_date.desc()).all()
         available_dates = [str(d.score_date) for d in dates]
@@ -266,26 +280,12 @@ def show_economic_dashboard():
         st.error(f"載入數據時發生錯誤: {e}")
     finally:
         db.close()
-############################################################
+##-------------------------------------------------------------------------------------------- 
 def show_news_dashboard():
     st.title("📰 美股精選新聞 💰")
 
     days = st.sidebar.slider("幾天內新聞？", 1, 30, 7)
     limit = st.sidebar.number_input("顯示數量", 5, 50, 10)
-    
-    if st.sidebar.button("💡 立即抓取最新新聞"):
-        with st.spinner("正在分析財經新聞中..."):
-            try:
-                from scr import for_news_main 
-                num_imported = for_news_main.main() 
-                
-                if num_imported and num_imported > 0:
-                    st.sidebar.success(f"✅ 新聞更新完成！共抓取 {num_imported} 則")
-                    st.rerun() 
-                else:
-                    st.sidebar.warning("⚠️ 抓取結束，但沒有新增新聞（可能皆為重複）。")
-            except Exception as e:
-                st.sidebar.error(f"❌ 抓取失敗：{e}")
 
     db = SessionLocal()
     try:
@@ -298,23 +298,34 @@ def show_news_dashboard():
             .limit(limit).all()
     
         if not top_news:
-            st.warning("所選範圍內尚無新聞資料，請點擊左側「立即抓取」按鈕。")
+            st.warning("尚無新聞資料，請點擊左側「💡立即抓取」按鈕。")
         else:
             for news in top_news:
                 with st.container():
-                    col_s, col_c = st.columns([1, 6])
-                    col_s.metric("重要性", f"{news.importance_score:.2f}")
-                    with col_c:
+                    col_score, col_main = st.columns([1.5, 6])
+                    
+                    with col_score:
+                        st.metric("重要性", f"{news.importance_score:.2f}")
+                        fb_val = news.sentiment_score
+                        tb_val = getattr(news, 'sentiment_textblob', 0.5)
+                        st.write(f"🤖 **Fin:** `{fb_val:.2f}`")
+                        st.write(f"📝 **Blob:** `{tb_val:.2f}`")
+
+                    with col_main:
                         st.subheader(f"[{news.title}]({news.link})")
-                        st.caption(f"來源: {news.source} | 情緒: {news.sentiment_score:.2f}")
-                        with st.expander("內容摘要"):
+                        st.caption(f"來源: {news.source} | 抓取時間: {news.created_at.strftime('%m/%d %H:%M')}")
+                        
+                        with st.expander("🔍 內容摘要"):
                             st.write(news.content)
+                            if fb_val > 0.6: st.success("市場情緒: Bullish")
+                            elif fb_val < 0.4: st.error("市場情緒: Bearish")
+                            else: st.info("市場情緒: Neutral")
                     st.divider() 
     except Exception as e:
-        st.error(f"讀取新聞失敗：{e}")
+        st.error(f"讀取失敗：{e}")
     finally:
         db.close()
-    
+##--------------------------------------------------------------------------------------------    
 pg = st.navigation([
     st.Page(show_economic_dashboard, title="經濟指標", icon="📈"),
     st.Page(show_main_charts, title="大盤指數圖", icon="⚖️"),

@@ -1,4 +1,3 @@
-
 import feedparser
 from newspaper import Article
 from textblob import TextBlob
@@ -19,7 +18,6 @@ DATABASE_URL = (
     f"?ssl_verify_cert=true&ssl_verify_identity=true"
 )
 
-# 建立 Engine，加入連線池優化與 SSL 參數
 engine = create_engine(
     DATABASE_URL,
     pool_size=5,

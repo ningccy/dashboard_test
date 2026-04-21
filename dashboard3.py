@@ -164,7 +164,6 @@ for i, symbol in enumerate(target_stocks):
             )
         else:
             st.info(f"等待 {symbol}...")
-
 st.divider()
 #####################################################################
 def get_fx_data():

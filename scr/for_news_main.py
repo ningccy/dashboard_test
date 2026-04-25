@@ -32,7 +32,8 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-finbert = pipeline("sentiment-analysis", model="yiyanghkust/finbert-tone")
+device = 0 if torch.cuda.is_available() else -1
+finbert = pipeline("sentiment-analysis", model="yiyanghkust/finbert-tone", device=device)
 
 class NewsArticle(Base):
     __tablename__ = "news_articles"
@@ -54,6 +55,8 @@ RSS_FEEDS = {
 }
 ##################################################################
 def get_sentiment(text):
+    if not text:
+        return 0.5, 0.5
     blob_polarity = TextBlob(text).sentiment.polarity
     tb_score = (blob_polarity + 1) / 2
 
@@ -61,11 +64,13 @@ def get_sentiment(text):
         res = finbert(text[:512])[0] #  上限 512 tokens
         label_map = {'Positive': 1, 'Negative': 0, 'Neutral': 0.5}
         fb_score = label_map.get(res['label'], 0.5)
-    except:
+    except Exception as e:
         fb_score = tb_score # Fallback 備援
-    return fb_score, tb_score
+    return float(fb_score), float(tb_score)
 ###################################################################
 def calculate_importance(content, sentiment_score):
+    if not content:
+        content = ""
     keywords = ['fed','surge','rally','ATH','outperform','plunge','plummet','sell-out','slide','dip','guidance','bullish','bearish','blue-chip','ipo','hawkish','dovish','fomc','YTD','YoY','QoQ','inflation','rate cut','earnings','nasdaq','s&p 500','DJIA','QQQ','apple','meta','google','nvidia']
     hit_count = sum(1 for word in keywords if word in content.lower())
     kw_score = min(hit_count / 3, 1.0)
@@ -96,9 +101,10 @@ def main():
                     article.download()
                     article.parse()
 
-                    title = entry.title
+                    title = entry.get('title', 'No Title')
+                    raw_content = article.text if article.text else ""
                     clean_content = article.text.strip()[:500]
-                    sent_score = get_sentiment(title)
+                    fb_score, tb_score = get_sentiment(title)
                     imp_score = calculate_importance(clean_content, sent_score)
                     content = article.text
 
@@ -108,7 +114,8 @@ def main():
                         link  =link,
                         source = name,
                         content = clean_content,
-                        sentiment_score = sent_score,
+                        sentiment_score = fb_score,     
+                        sentiment_textblob = tb_score
                         importance_score = imp_score,
                         published = entry.get('published', ''),
                         created_at = datetime.now()

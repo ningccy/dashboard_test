@@ -304,9 +304,11 @@ def show_news_dashboard():
                     col_score, col_main = st.columns([1.5, 6])
                     
                     with col_score:
-                        st.metric("重要性", f"{news.importance_score:.2f}")
-                        fb_val = news.sentiment_score
-                        tb_val = getattr(news, 'sentiment_textblob', 0.5)
+                        imp = news.importance_score if news.importance_score is not None else 0.0
+                        fb = news.sentiment_score if news.sentiment_score is not None else 0.5
+                        tb = getattr(news, 'sentiment_textblob', 0.5) or 0.5
+                        
+                        st.metric("重要性", f"{imp:.2f}")
                         st.write(f"🤖 **Fin:** `{fb_val:.2f}`")
                         st.write(f"📝 **Blob:** `{tb_val:.2f}`")
 

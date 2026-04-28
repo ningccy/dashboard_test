@@ -115,7 +115,7 @@ def main():
                         source = name,
                         content = clean_content,
                         sentiment_score = fb_score,     
-                        sentiment_textblob = tb_score
+                        sentiment_textblob = tb_score,
                         importance_score = imp_score,
                         published = entry.get('published', ''),
                         created_at = datetime.now()

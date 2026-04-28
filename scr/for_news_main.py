@@ -103,19 +103,19 @@ def main():
                 fb_score, tb_score = get_sentiment(entry.title)
                 imp_score = calculate_importance(article.text, fb_score)
 
-            db.add(NewsArticle(
-                title=entry.title[:250],
-                link=entry.link,
-                source=name,
-                content=article.text[:1000],
-                sentiment_score=fb_score,
-                sentiment_textblob=tb_score,
-                importance_score=imp_score,
-                published=entry.get('published', '')
-            ))
+                new_post = NewsArticle(
+                        title=entry.title[:250],
+                        link=entry.link,
+                        source=name,
+                        content=article.text[:1000],
+                        sentiment_score=fb_score,
+                        sentiment_textblob=tb_score,
+                        importance_score=imp_score,
+                        published=entry.get('published', '')
+                    )
+                db.add(new_post)
                 db.commit()
-
-            print(f"✅ {entry.title[:30]}")
+                print(f"✅ {entry.title[:30]}")
             except Exception as e:
                 db.rollback()
                 print(f"❌ 失敗: {e}")

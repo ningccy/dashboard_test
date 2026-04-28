@@ -6,7 +6,16 @@ import time
 from sqlalchemy import create_engine, Column, Integer, Float, String, DateTime, Text
 from sqlalchemy.orm import sessionmaker, declarative_base
 import torch
-from transformers import pipeline
+from transformers import BertConfig, BertForSequenceClassification
+
+config = BertConfig.from_pretrained("yiyanghkust/finbert-tone")
+# 手動確保有 model_type
+config.model_type = "bert" 
+
+model = BertForSequenceClassification.from_pretrained(
+    "yiyanghkust/finbert-tone", 
+    config=config
+)
 
 DB_USER = "4RyYfQMvnH9DmYu.root"
 DB_PASSWORD = "XD2WuF9AcDymVeCt"

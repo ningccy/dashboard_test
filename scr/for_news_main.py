@@ -101,7 +101,7 @@ def main():
                     article.parse()
 
                     fb_score, tb_score = get_sentiment(entry.title)
-                imp_score = calculate_importance(article.text, fb_score)
+                    imp_score = calculate_importance(article.text, fb_score)
 
                 db.add(NewsArticle(
                     title=entry.title[:250],

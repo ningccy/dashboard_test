@@ -114,7 +114,7 @@ def main():
                     raw_content = article.text if article.text else ""
                     clean_content = article.text.strip()[:500]
                     fb_score, tb_score = get_sentiment(title)
-                    imp_score = calculate_importance(clean_content, sent_score)
+                    imp_score = calculate_importance(clean_content, fb_score)
                     content = article.text
 
 

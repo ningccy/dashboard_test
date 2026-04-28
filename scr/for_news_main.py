@@ -6,16 +6,10 @@ import time
 from sqlalchemy import create_engine, Column, Integer, Float, String, DateTime, Text
 from sqlalchemy.orm import sessionmaker, declarative_base
 import torch
-from transformers import BertConfig, BertForSequenceClassification
+from transformers import pipeline
 
-config = BertConfig.from_pretrained("yiyanghkust/finbert-tone")
-# 手動確保有 model_type
-config.model_type = "bert" 
-
-model = BertForSequenceClassification.from_pretrained(
-    "yiyanghkust/finbert-tone", 
-    config=config
-)
+device = 0 if torch.cuda.is_available() else -1
+finbert = pipeline("sentiment-analysis", model="yiyanghkust/finbert-tone", device=device)
 
 DB_USER = "4RyYfQMvnH9DmYu.root"
 DB_PASSWORD = "XD2WuF9AcDymVeCt"

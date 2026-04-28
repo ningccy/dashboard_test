@@ -40,16 +40,16 @@ finbert = pipeline("sentiment-analysis", model="yiyanghkust/finbert-tone", devic
 
 class NewsArticle(Base):
     __tablename__ = "news_articles"
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key = True, index = True)
     title = Column(String(255))
-    link = Column(String(500), unique=True)
+    link = Column(String(1000), unique = True)
     source = Column(String(50))
     content = Column(Text)
     sentiment_score = Column(Float)      
     sentiment_textblob = Column(Float)
     importance_score = Column(Float)
     published = Column(String(100))
-    created_at = Column(DateTime, default=datetime.now)
+    created_at = Column(DateTime, default = datetime.now)
 
 RSS_FEEDS = {
     "CNN_Business": "http://rss.cnn.com/rss/money_latest.rss",
@@ -83,64 +83,42 @@ def calculate_importance(content, sentiment_score):
 def main():
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
+    ###### 設置 newspaper 的下載超時 ######
+    config = Config()
+    config.browser_user_agent = 'Mozilla/5.0'
+    config.request_timeout = 10
     count = 0
-    
-    print("--- 開始抓取新聞 ---")
-    try:
-        for name, url in RSS_FEEDS.items():
-            print(f"正在掃描 {name}...")
-            feed = feedparser.parse(url)
-            
-            for entry in feed.entries[:10]:
-                link = entry.link
+     
+    for name, url in RSS_FEEDS.items():
+        feed = feedparser.parse(url)
+        for entry in feed.entries[:10]:
+            if db.query(NewsArticle).filter(NewsArticle.link == entry.link).first():
+                continue
                 
-                existing = db.query(NewsArticle).filter(NewsArticle.link == link).first()
-                if existing:
-                    print(f"跳過重複: {link[:30]}...")
-                    continue 
-
                 try:
                     article = Article(link,language='en')
                     article.download()
                     article.parse()
 
-                    title = entry.get('title', 'No Title')
-                    raw_content = article.text if article.text else ""
-                    clean_content = article.text.strip()[:500]
-                    fb_score, tb_score = get_sentiment(title)
-                    imp_score = calculate_importance(clean_content, fb_score)
-                    content = article.text
+                    fb_score, tb_score = get_sentiment(entry.title)
+                imp_score = calculate_importance(article.text, fb_score)
 
-
-                    new_news = NewsArticle(
-                        title = title[:250],
-                        link  =link,
-                        source = name,
-                        content = clean_content,
-                        sentiment_score = fb_score,     
-                        sentiment_textblob = tb_score,
-                        importance_score = imp_score,
-                        published = entry.get('published', ''),
-                        created_at = datetime.now()
-                    )                    
-                    db.add(new_news)
+                db.add(NewsArticle(
+                    title=entry.title[:250],
+                    link=entry.link,
+                    source=name,
+                    content=article.text[:1000],
+                    sentiment_score=fb_score,
+                    sentiment_textblob=tb_score,
+                    importance_score=imp_score,
+                    published=entry.get('published', '')
+                ))
                     db.commit()
-                    
-                    print(f"✅ 已匯入: {title[:30]}...")
-                    count += 1
-                    time.sleep(1)
 
-                except Exception as e:
-                    db.rollback()
-                    print(f"❌ 單篇解析失敗: {e}")
-                    continue
-                    
-    except Exception as big_e:
-        print(f"💥 程式執行中斷: {big_e}")        
-    finally:
-        db.close()
-        print(f"--- 任務結束，共抓取 {count} 則新聞 ---")
-    
-    return count
+                print(f"✅ {entry.title[:30]}")
+            except Exception as e:
+                db.rollback()
+                print(f"❌ 失敗: {e}")
+    db.close()
 if __name__ == "__main__":
     main()

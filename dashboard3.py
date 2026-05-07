@@ -309,8 +309,8 @@ def show_news_dashboard():
                         tb = getattr(news, 'sentiment_textblob', 0.5) or 0.5
                         
                         st.metric("重要性", f"{imp:.2f}")
-                        st.write(f"🤖 **Fin:** `{fb_val:.2f}`")
-                        st.write(f"📝 **Blob:** `{tb_val:.2f}`")
+                        st.write(f"🤖 **Fin:** `{fb:.2f}`")
+                        st.write(f"📝 **Blob:** `{tb:.2f}`")
 
                     with col_main:
                         st.subheader(f"[{news.title}]({news.link})")
@@ -318,8 +318,8 @@ def show_news_dashboard():
                         
                         with st.expander("🔍 內容摘要"):
                             st.write(news.content)
-                            if fb_val > 0.6: st.success("市場情緒: Bullish")
-                            elif fb_val < 0.4: st.error("市場情緒: Bearish")
+                            if fb > 0.6: st.success("市場情緒: Bullish")
+                            elif fb < 0.4: st.error("市場情緒: Bearish")
                             else: st.info("市場情緒: Neutral")
                     st.divider() 
     except Exception as e:

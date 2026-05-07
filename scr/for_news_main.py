@@ -6,10 +6,7 @@ import time
 from sqlalchemy import create_engine, Column, Integer, Float, String, DateTime, Text
 from sqlalchemy.orm import sessionmaker, declarative_base
 import torch
-from transformers import pipeline
-
-device = 0 if torch.cuda.is_available() else -1
-finbert = pipeline("sentiment-analysis", model="yiyanghkust/finbert-tone", device=device)
+from transformers import pipeline, BertTokenizer, BertForSequenceClassificationx
 
 DB_USER = "4RyYfQMvnH9DmYu.root"
 DB_PASSWORD = "XD2WuF9AcDymVeCt"
@@ -35,8 +32,16 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
+model_name = "yiyanghkust/finbert-tone"
+tokenizer = BertTokenizer.from_pretrained(model_name)
+model = BertForSequenceClassification.from_pretrained(model_name)
 device = 0 if torch.cuda.is_available() else -1
-finbert = pipeline("sentiment-analysis", model="yiyanghkust/finbert-tone", device=device)
+
+finbert = pipeline(
+    "sentiment-analysis", 
+    model=model, 
+    tokenizer=tokenizer, 
+    device=device)
 
 class NewsArticle(Base):
     __tablename__ = "news_articles"
@@ -56,7 +61,7 @@ RSS_FEEDS = {
     "BBC_Business": "http://feeds.bbci.co.uk/news/business/rss.xml",
     'Yahoo Finance': 'https://finance.yahoo.com/news/rssindex'
 }
-##################################################################
+
 def get_sentiment(text):
     if not text:
         return 0.5, 0.5
@@ -70,14 +75,14 @@ def get_sentiment(text):
     except Exception as e:
         fb_score = tb_score # Fallback 備援
     return float(fb_score), float(tb_score)
-###################################################################
+
 def calculate_importance(content, sentiment_score):
-    if not content:
-        content = ""
+    if not content: content = ""
+    sentiment_intensity = abs(sentiment_score - 0.5) * 2 #情緒強度（偏離中立點的距離）
     keywords = ['fed','surge','rally','ATH','outperform','plunge','plummet','sell-out','slide','dip','guidance','bullish','bearish','blue-chip','ipo','hawkish','dovish','fomc','YTD','YoY','QoQ','inflation','rate cut','earnings','nasdaq','s&p 500','DJIA','QQQ','apple','meta','google','nvidia']
     hit_count = sum(1 for word in keywords if word in content.lower())
     kw_score = min(hit_count / 3, 1.0)
-    total_score = (0.4 * sentiment_score) + (0.4 * kw_score) + (0.2 * min(len(content)/800, 1.0))
+    total_score = (0.4 * sentiment_intensity) + (0.4 * kw_score) + (0.2 * min(len(content)/800, 1.0)) 
     return round(total_score, 3)
 
 def main():

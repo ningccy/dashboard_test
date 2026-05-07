@@ -101,7 +101,7 @@ def main():
                 continue
                 
             try:
-                article = Article(link,language='en')
+                article = Article(entry.link,language='en')
                 article.download()
                 article.parse()
 

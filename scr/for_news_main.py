@@ -22,14 +22,14 @@ DATABASE_URL = (
 
 engine = create_engine(
     DATABASE_URL,
-    pool_size=5,
-    pool_pre_ping=True,
-    max_overflow=10,
-    pool_recycle=3600,
-    connect_args={"ssl": {"fake_flag_to_enable_tls": True}}
+    pool_size = 5,
+    pool_pre_ping = True,
+    max_overflow = 10,
+    pool_recycle = 3600,
+    connect_args = {"ssl": {"fake_flag_to_enable_tls": True}}
 )
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(autocommit = False, autoflush = False, bind = engine)
 Base = declarative_base()
 
 model_name = "yiyanghkust/finbert-tone"
@@ -39,9 +39,9 @@ device = 0 if torch.cuda.is_available() else -1
 
 finbert = pipeline(
     "sentiment-analysis", 
-    model=model, 
-    tokenizer=tokenizer, 
-    device=device)
+    model = model, 
+    tokenizer = tokenizer, 
+    device = device)
 
 class NewsArticle(Base):
     __tablename__ = "news_articles"
@@ -59,7 +59,7 @@ class NewsArticle(Base):
 RSS_FEEDS = {
     "CNN_Business": "http://rss.cnn.com/rss/money_latest.rss",
     "BBC_Business": "http://feeds.bbci.co.uk/news/business/rss.xml",
-    'Yahoo Finance': 'https://finance.yahoo.com/news/rssindex'
+    "Yahoo Finance": "https://finance.yahoo.com/news/rssindex"
 }
 
 def get_sentiment(text):
@@ -109,14 +109,14 @@ def main():
                 imp_score = calculate_importance(article.text, fb_score)
 
                 new_post = NewsArticle(
-                        title=entry.title[:250],
-                        link=entry.link,
-                        source=name,
-                        content=article.text[:1000],
-                        sentiment_score=fb_score,
-                        sentiment_textblob=tb_score,
-                        importance_score=imp_score,
-                        published=entry.get('published', '')
+                        title = entry.title[:250],
+                        link = entry.link,
+                        source = name,
+                        content = article.text[:1000],
+                        sentiment_score = fb_score,
+                        sentiment_textblob = tb_score,
+                        importance_score = imp_score,
+                        published = entry.get('published', '')
                     )
                 db.add(new_post)
                 db.commit()

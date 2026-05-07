@@ -309,7 +309,7 @@ def show_news_dashboard():
                         tb = getattr(news, 'sentiment_textblob', 0.5) or 0.5
                         
                         st.metric("重要性", f"{imp:.2f}")
-                        st.write(f"🤖 **Fin:** `{fb:.2f}`")
+                        st.write(f"📖 **Fin:** `{fb:.2f}`")
                         st.write(f"📝 **Blob:** `{tb:.2f}`")
 
                     with col_main:

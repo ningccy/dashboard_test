@@ -284,13 +284,6 @@ def show_news_dashboard():
     with st.sidebar:
         days = st.sidebar.slider("幾天內新聞？", 1, 30, 7)
         limit = st.sidebar.number_input("顯示數量", 5, 50, 10)
-        if st.button("💡 立即抓取"):
-                with st.spinner("抓取中..."):
-                    count = main() 
-                    st.session_state['last_count'] = count
-                st.rerun()
-        if 'last_count' in st.session_state:
-                st.info(f"上次抓取新增：{st.session_state['last_count']} 筆")
         
     db = SessionLocal()
     try:

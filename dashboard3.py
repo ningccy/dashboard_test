@@ -287,9 +287,9 @@ def show_news_dashboard():
         days = st.sidebar.slider("幾天內新聞？", 1, 30, 7)
         limit = st.sidebar.number_input("顯示數量", 5, 50, 10)
     if 'last_count' in st.session_state:
-            st.markdown(f"**處理數據：{st.session_state['last_count']} 筆**")
+        st.markdown(f"**處理數據：{st.session_state['last_count']} 筆**")
     else:
-        st.markdown("**處理數據：*** 筆**")
+        st.markdown(f"**處理數據：{last_count} 筆**")
     
     db = SessionLocal()
     try:

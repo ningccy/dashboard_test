@@ -84,7 +84,7 @@ except Exception as schema_e:
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(current_dir, "scr")) 
-##-----------------------------------------------------------
+##--------------------側邊按鈕------------------------
 st.sidebar.title("- 跟上世界的按鈕 -")
 if st.sidebar.button("🚀 立即更新大盤數據"):
     with st.spinner("正在同步 yfinance 數據..."):
@@ -130,8 +130,7 @@ if st.sidebar.button("💡 立即抓取最新新聞"):
                 st.sidebar.warning("無新增新聞（可能皆為重複）。")
         except Exception as e:
             st.sidebar.error(f"❌ 抓取失敗：{e}")
-##---------------------------------------------------------------------
-# API 邏輯
+##---------------------------API 邏輯------------------------------------
 @st.cache_data(ttl=600)
 def fetch_stock_price_internal(symbol):
     try:
@@ -148,7 +147,7 @@ def fetch_stock_price_internal(symbol):
         }
     except:
         return None
-#---------------------------------------------------------------------------------------------------------------修改
+#----------------------------熱門標的即時監控---------------------------------修改
 st.subheader("🔥 熱門標的即時監控")
 target_stocks = ["NVDA", "TSLA", "COST", "BA"] 
 stock_cols = st.columns(len(target_stocks))
@@ -165,7 +164,7 @@ for i, symbol in enumerate(target_stocks):
         else:
             st.info(f"等待 {symbol}...")
 st.divider()
-#####################################################################
+###-----------------------------------------------------------------------
 def get_fx_data():
     query = "SELECT date, close_price FROM exchange_rates ORDER BY date ASC"
     df = pd.read_sql(query, engine)
@@ -179,7 +178,7 @@ if not fx_df.empty:
     st.line_chart(fx_df.set_index('date')['close_price'])
 else:
     st.warning("目前資料庫中沒有匯率數據，請執行爬蟲程式。")
-####################################################################
+##----------------------------大盤指數圖--------------------------------------
 def show_main_charts():
     st.title("⚖️ 大盤指數圖 🔍")
 
@@ -221,7 +220,7 @@ def show_main_charts():
 
     except Exception as e:
         st.error(f"繪圖發生錯誤：{e}")
-##########################################################################
+##--------------------------------經濟健康燈號---------------------------------------
 def show_economic_dashboard():
     st.title("📊 經濟健康燈號 🚥")
     db = SessionLocal()
@@ -279,13 +278,20 @@ def show_economic_dashboard():
         st.error(f"載入數據時發生錯誤: {e}")
     finally:
         db.close()
-##-------------------------------------------------------------------------------------------- 
+##----------------------------------精選新聞----------------------------------------
 def show_news_dashboard():
     st.title("📰 美股精選新聞 💰")
-
-    days = st.sidebar.slider("幾天內新聞？", 1, 30, 7)
-    limit = st.sidebar.number_input("顯示數量", 5, 50, 10)
-
+    with st.sidebar:
+        days = st.sidebar.slider("幾天內新聞？", 1, 30, 7)
+        limit = st.sidebar.number_input("顯示數量", 5, 50, 10)
+        if st.button("💡 立即抓取"):
+                with st.spinner("抓取中..."):
+                    count = main() 
+                    st.session_state['last_count'] = count
+                st.rerun()
+        if 'last_count' in st.session_state:
+                st.info(f"上次抓取新增：{st.session_state['last_count']} 筆")
+        
     db = SessionLocal()
     try:
         now_local = datetime.now()

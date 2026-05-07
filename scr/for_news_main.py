@@ -92,7 +92,7 @@ def main():
     config = Config()
     config.browser_user_agent = 'Mozilla/5.0'
     config.request_timeout = 10
-    count = 0
+    success_count = 0
      
     for name, url in RSS_FEEDS.items():
         feed = feedparser.parse(url)
@@ -120,10 +120,12 @@ def main():
                     )
                 db.add(new_post)
                 db.commit()
+                success_count += 1
                 print(f"✅ {entry.title[:30]}")
             except Exception as e:
                 db.rollback()
                 print(f"❌ 失敗: {e}")
     db.close()
+    return success_count
 if __name__ == "__main__":
     main()

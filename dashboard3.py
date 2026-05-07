@@ -289,12 +289,15 @@ def show_news_dashboard():
         limit = st.sidebar.number_input("顯示數量", 5, 50, 10)
 
         last_count = st.session_state.get('last_count', 0)
-        st.sidebar.markdown(f"**處理數據：{last_count} 筆**")
+        total_count = db.query(NewsArticle).count()
+        
+        st.markdown(f"**目前資料庫總量：{total_count} 筆**")
+        st.sidebar.markdown(f"**當次處理數據：{last_count} 筆**")
     
     db = SessionLocal()
     try:
         now_local = datetime.now()
-        time_threshold = now_local - timedelta(days=days)
+        time_threshold = now_local - timedelta(days = days)
         
         top_news = db.query(NewsArticle) \
             .filter(NewsArticle.created_at >= time_threshold) \

@@ -29,13 +29,13 @@ try:
     engine = create_engine(
  
         DATABASE_URL,
-        pool_size=10,
-        max_overflow=20,
-        pool_recycle=3600,
-        connect_args={"ssl": {"fake_flag_to_enable_tls": True}}
+        pool_size = 10,
+        max_overflow = 20,
+        pool_recycle = 3600,
+        connect_args = {"ssl": {"fake_flag_to_enable_tls": True}}
     )
     
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    SessionLocal = sessionmaker(autocommit = False, autoflush = False, bind = engine)
     Base = declarative_base()
 
     with engine.connect() as conn:
@@ -48,7 +48,7 @@ except Exception as e:
 
 class NewsArticle(Base):
     __tablename__ = "news_articles"
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key = True, index = True)
     title = Column(String(255))
     link = Column(String(500), unique=True)
     source = Column(String(50))
@@ -61,7 +61,7 @@ class NewsArticle(Base):
 
 class EconomicScore(Base):
     __tablename__ = "economic_score"
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key = True)
     symbol = Column(String(20))
     score_date = Column(Date)
     open = Column(Float)
@@ -77,7 +77,7 @@ class EconomicScore(Base):
     signal_light = Column(String(20))
 
 try:
-    Base.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind = engine)
     st.sidebar.info("📌 資料庫結構已完成同步")
 except Exception as schema_e:
     st.sidebar.error(f"結構同步失敗：{schema_e}")
@@ -102,14 +102,14 @@ if st.sidebar.button("💱 立即同步匯率數據"):
     with st.spinner("正在獲取 USD/TWD 匯率..."):
         try:
             import yfinance as yf
-            fx_data = yf.download("TWD=X", start="2015-01-01")
+            fx_data = yf.download("TWD = X", start = "2015-01-01")
             
             if not fx_data.empty:
                 fx_df = fx_data[['Close']].reset_index()
                 fx_df.columns = ['date', 'close_price']
-                fx_df['ticker'] = "TWD=X"
+                fx_df['ticker'] = "TWD = X"
                 
-                fx_df.to_sql('exchange_rates', con=engine, if_exists='replace', index=False)
+                fx_df.to_sql('exchange_rates', con = engine, if_exists = 'replace', index = False)
                 
                 st.sidebar.success("匯率同步完成！")
                 st.rerun()
@@ -131,11 +131,11 @@ if st.sidebar.button("💡 立即抓取最新新聞"):
         except Exception as e:
             st.sidebar.error(f"❌ 抓取失敗：{e}")
 ##---------------------------API 邏輯------------------------------------
-@st.cache_data(ttl=600)
+@st.cache_data(ttl = 600)
 def fetch_stock_price_internal(symbol):
     try:
         stock = yf.Ticker(symbol)
-        hist = stock.history(period="1mo")
+        hist = stock.history(period = "1mo")
         if hist.empty:
             return None
         latest_price = hist['Close'].iloc[-1]
@@ -157,9 +157,9 @@ for i, symbol in enumerate(target_stocks):
         s_data = fetch_stock_price_internal(symbol)
         if s_data:
             st.metric(
-                label=s_data["symbol"], 
-                value=f"${s_data['current_price']}", 
-                delta=f"{s_data['change']}"
+                label = s_data["symbol"], 
+                value = f"${s_data['current_price']}", 
+                delta = f"{s_data['change']}"
             )
         else:
             st.info(f"等待 {symbol}...")
@@ -170,7 +170,7 @@ def get_fx_data():
     df = pd.read_sql(query, engine)
     df['date'] = pd.to_datetime(df['date'])
     return df
-st.title("美元對:新台幣 (USD/TWD) 走勢圖")
+st.title("美元:新台幣 (USD/TWD) 走勢圖")
 
 fx_df = get_fx_data()
 

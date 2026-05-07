@@ -1,5 +1,5 @@
 import feedparser
-from newspaper import Article
+from newspaper import Article, Config
 from textblob import TextBlob
 from datetime import datetime
 import time

@@ -6,7 +6,7 @@ import time
 from sqlalchemy import create_engine, Column, Integer, Float, String, DateTime, Text
 from sqlalchemy.orm import sessionmaker, declarative_base
 import torch
-from transformers import pipeline, BertTokenizer, BertForSequenceClassificationx
+from transformers import pipeline, BertTokenizer, BertForSequenceClassification
 
 DB_USER = "4RyYfQMvnH9DmYu.root"
 DB_PASSWORD = "XD2WuF9AcDymVeCt"

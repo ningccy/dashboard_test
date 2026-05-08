@@ -284,19 +284,20 @@ def show_economic_dashboard():
 def show_news_dashboard():
     st.title("📰 美股精選新聞 💰")
     db = SessionLocal()
-    with st.sidebar:
-        days = st.sidebar.slider("幾天內新聞？", 1, 30, 7)
-        limit = st.sidebar.number_input("顯示數量", 5, 50, 10)
-
-        st.divider()
-
-        last_count = st.session_state.get('last_count', 0)
-        total_count = db.query(NewsArticle).count()
-        
-        st.markdown(f"**目前資料庫總量：{total_count} 筆**")
-        st.sidebar.markdown(f"**當次處理數據：{last_count} 筆**")
     
     try:
+        with st.sidebar:
+            days = st.sidebar.slider("幾天內新聞？", 1, 30, 7)
+            limit = st.sidebar.number_input("顯示數量", 5, 50, 10)
+            
+            st.divider()
+
+            last_count = st.session_state.get('last_count', 0)
+            total_count = db.query(NewsArticle).count()
+            
+            st.markdown(f"**目前資料庫總量：{total_count} 筆**")
+            st.sidebar.markdown(f"**當次處理數據：{last_count} 筆**")
+
         now_local = datetime.now()
         time_threshold = now_local - timedelta(days = days)
         

@@ -69,11 +69,11 @@ def get_sentiment(text):
     tb_score = (blob_polarity + 1) / 2
 
     try:
-        res = finbert(text[:512])[0] #  上限 512 tokens
+        res = finbert(text[:512])[0] 
         label_map = {'Positive': 1, 'Negative': 0, 'Neutral': 0.5}
         fb_score = label_map.get(res['label'], 0.5)
     except Exception as e:
-        fb_score = tb_score # Fallback 備援
+        fb_score = tb_score
     return float(fb_score), float(tb_score)
 
 def calculate_importance(content, sentiment_score):
@@ -88,7 +88,6 @@ def calculate_importance(content, sentiment_score):
 def main():
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
-    ###### 設置 newspaper 的下載超時 ######
     config = Config()
     config.browser_user_agent = 'Mozilla/5.0'
     config.request_timeout = 10

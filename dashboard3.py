@@ -132,7 +132,7 @@ if st.sidebar.button("💡 立即抓取最新新聞"):
         except Exception as e:
             st.sidebar.error(f"❌ 抓取失敗：{e}")
 st.divider()
-##---------------------------API 邏輯------------------------------------
+##---------------------------API---------------------------------
 @st.cache_data(ttl = 600)
 def fetch_stock_price_internal(symbol):
     try:
@@ -149,7 +149,7 @@ def fetch_stock_price_internal(symbol):
         }
     except:
         return None
-#----------------------------熱門標的即時監控---------------------------------修改
+#--------------------------熱門標的即時監控---------------------------
 st.subheader("🔥 熱門標的即時監控")
 target_stocks = ["NVDA", "TSLA", "COST", "BA"] 
 stock_cols = st.columns(len(target_stocks))
@@ -166,7 +166,7 @@ for i, symbol in enumerate(target_stocks):
         else:
             st.info(f"等待 {symbol}...")
 st.divider()
-###-----------------------------------------------------------------------
+##----------------------------------------------------------------
 def get_fx_data():
     query = "SELECT date, close_price FROM exchange_rates ORDER BY date ASC"
     df = pd.read_sql(query, engine)
@@ -336,7 +336,7 @@ def show_news_dashboard():
         st.error(f"讀取失敗：{e}")
     finally:
         db.close()
-##--------------------------------------------------------------------------------------------    
+##----------------------------------------------------------------------------- 
 pg = st.navigation([
     st.Page(show_economic_dashboard, title="經濟指標", icon="📈"),
     st.Page(show_main_charts, title="大盤指數圖", icon="⚖️"),

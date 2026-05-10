@@ -2,11 +2,10 @@ from transformers import BertTokenizer, BertForSequenceClassification
 from transformers import pipeline
 import torch
 
-# nlp工作定義
 model_name = "yiyanghkust/finbert-tone" 
-tokenizer = BertTokenizer.from_pretrained(model_name) # 分詞器
-model = BertForSequenceClassification.from_pretrained(model_name) # 讀懂文章
-nlp = pipeline("sentiment-analysis", model = model, tokenizer = tokenizer) # 包裝在一起
+tokenizer = BertTokenizer.from_pretrained(model_name) 
+model = BertForSequenceClassification.from_pretrained(model_name) 
+nlp = pipeline("sentiment-analysis", model = model, tokenizer = tokenizer) 
 
 def get_finbert_sentiment(text):
     if not text or len(text) < 5:

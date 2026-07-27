@@ -4,17 +4,19 @@ import numpy as np
 import time
 import os 
 from sqlalchemy import create_engine, text
+import streamlit as st
 
-USERNAME = "4RyYfQMvnH9DmYu.root"
-PASSWORD = "XD2WuF9AcDymVeCt"
-HOST = "gateway01.ap-northeast-1.prod.aws.tidbcloud.com"
-PORT = "4000"
-DATABASE = "macro_monitor_1"
-###
+db_config = st.secrets["mysql"]
+DATABASE_URL = (
+    f"mysql+pymysql://{db_config['user']}:{db_config['password']}@"
+    f"{db_config['host']}:{db_config['port']}/{db_config['database']}"
+    f"?ssl_verify_cert=true&ssl_verify_identity=true"
+)
+
 ssl_args = {"ssl_ca": "/etc/ssl/cert.pem"}
 if not os.path.exists("/etc/ssl/cert.pem"):
     ssl_args = {}
-###
+
 DATABASE_URL = f"mysql+pymysql://{USERNAME}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}?ssl_ca=/etc/ssl/cert.pem"
 engine = create_engine(
     DATABASE_URL,

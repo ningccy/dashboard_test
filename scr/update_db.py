@@ -12,12 +12,6 @@ DATABASE_URL = (
     f"{db_config['host']}:{db_config['port']}/{db_config['database']}"
     f"?ssl_verify_cert=true&ssl_verify_identity=true"
 )
-
-ssl_args = {"ssl_ca": "/etc/ssl/cert.pem"}
-if not os.path.exists("/etc/ssl/cert.pem"):
-    ssl_args = {}
-
-DATABASE_URL = f"mysql+pymysql://{USERNAME}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}?ssl_ca=/etc/ssl/cert.pem"
 engine = create_engine(
     DATABASE_URL,
     connect_args={"ssl": {"fake_flag_to_enable_tls": True}}

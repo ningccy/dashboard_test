@@ -11,16 +11,11 @@ st.set_page_config(page_title="經濟健康度儀表板", layout="wide")
 Base = declarative_base()
 
 try:
-    if "mysql" in st.secrets:
-        db_config = st.secrets["mysql"]
-    else:
-        db_config = {
-            "user": "4RyYfQMvnH9DmYu.root",
-            "password": "XD2WuF9AcDymVeCt",
-            "host": "gateway01.ap-northeast-1.prod.aws.tidbcloud.com",
-            "port": "4000",
-            "database": "macro_monitor_1"
-        }
+    if "mysql" not in st.secrets:
+        st.error("❌ 找不到資料庫連線設定，請在 Streamlit Secrets 中設定 [mysql] 區塊")
+        st.stop()
+    db_config = st.secrets["mysql"]
+    
     DATABASE_URL = (
         f"mysql+pymysql://{db_config['user']}:{db_config['password']}@"
         f"{db_config['host']}:{db_config['port']}/{db_config['database']}"

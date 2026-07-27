@@ -128,21 +128,28 @@ if st.sidebar.button("💡 立即抓取最新新聞"):
             st.sidebar.error(f"❌ 抓取失敗：{e}")
 st.divider()
 ##---------------------------API---------------------------------
+from curl_cffi import requests as cffi_requests
+
+session = cffi_requests.Session(impersonate="chrome")
+
 @st.cache_data(ttl = 600)
 def fetch_stock_price_internal(symbol):
     try:
-        stock = yf.Ticker(symbol)
+        stock = yf.Ticker(symbol, session=session)
         hist = stock.history(period = "1mo")
-        if hist.empty:
+        if hist.empty or hist['Close'].isna().all():
             return None
         latest_price = hist['Close'].iloc[-1]
         prev_price = hist['Close'].iloc[-2]
+        if pd.isna(latest_price) or pd.isna(prev_price):
+            return None
         return {
             "symbol": symbol.upper(),
             "current_price": round(latest_price, 2),
             "change": round(latest_price - prev_price, 2)
         }
-    except:
+    except Exception as e:
+        print(f" {symbol} 抓取失敗：{e}")
         return None
 #--------------------------熱門標的即時監控---------------------------
 st.subheader("🔥 熱門標的即時監控")

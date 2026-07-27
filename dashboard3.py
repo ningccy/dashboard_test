@@ -132,7 +132,7 @@ from curl_cffi import requests as cffi_requests
 
 session = cffi_requests.Session(impersonate="chrome")
 
-@st.cache_data(ttl = 600)
+@st.cache_data(ttl = 1800)
 def fetch_stock_price_internal(symbol):
     try:
         stock = yf.Ticker(symbol, session=session)

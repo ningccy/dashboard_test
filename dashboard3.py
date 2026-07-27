@@ -96,7 +96,7 @@ if st.sidebar.button("💱 立即同步匯率數據"):
     with st.spinner("正在獲取 USD/TWD 匯率..."):
         try:
             import yfinance as yf
-            fx_data = yf.download("TWD = X", start = "2015-01-01")
+            fx_data = yf.download("TWD=X", start = "2015-01-01")
             
             if not fx_data.empty:
                 fx_df = fx_data[['Close']].reset_index()

@@ -7,16 +7,12 @@ from sqlalchemy import create_engine, Column, Integer, Float, String, DateTime, 
 from sqlalchemy.orm import sessionmaker, declarative_base
 import torch
 from transformers import pipeline, BertTokenizer, BertForSequenceClassification
+import streamlit as st
 
-DB_USER = "4RyYfQMvnH9DmYu.root"
-DB_PASSWORD = "XD2WuF9AcDymVeCt"
-DB_HOST = "gateway01.ap-northeast-1.prod.aws.tidbcloud.com"
-DB_PORT = "4000"
-DB_NAME = "macro_monitor_1"
-
+db_config = st.secrets["mysql"]
 DATABASE_URL = (
-    f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@"
-    f"{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    f"mysql+pymysql://{db_config['user']}:{db_config['password']}@"
+    f"{db_config['host']}:{db_config['port']}/{db_config['database']}"
     f"?ssl_verify_cert=true&ssl_verify_identity=true"
 )
 
